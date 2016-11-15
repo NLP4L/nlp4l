@@ -1,0 +1,15 @@
+NLP4L
+Copyright 2016 org.NLP4L
+
+This product includes the following Open Source Softwares
+
+================================================================================
+Apache License Version 2.0
+================================================================================
+
+This product includes software developed at The Apache Software Foundation (http://www.apache.org/).
+
+spark-MDLP-discretization (https://github.com/sramirez/spark-MDLP-discretization)
+[LICENSE] https://github.com/sramirez/spark-MDLP-discretization/blob/master/LICENSE
+
+================================================================================

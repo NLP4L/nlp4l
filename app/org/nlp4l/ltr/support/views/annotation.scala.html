@@ -1,0 +1,353 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], ltrquery: Option[Ltrquery], count: (Int, Int), success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/annotation.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+	
+  <div class="container-fluid">
+    <div class="row">
+      <form id="annotationform" data-toggle="validator" method="post">
+      <div class="col-md-6">
+          <p class="text-success">@success</p>
+          <p class="text-danger">@error</p>
+      </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-9 col-md-10 main">
+         <table class="table">
+         <tr><td  align="right" colspan="4" class="text-default" style="border: 0;">Saved Data: <span id="saved_count">@count._1</span> / <span id="total_count">@count._2</span></td></tr>
+         <tr>
+           <td>
+             <font size="+2"><b>Query = </b></font>
+           </td>
+           <td>
+         <input type="text" class="form-control" id="searchText" value="@ltrquery.get.query" style="font-weight: bold; font-size: 1.5em;">
+           </td>
+           <td>
+             <button id="search-button" class="btn btn-success" ><i class="glyphicon glyphicon-search"></i> Search</button>
+           </td>
+           <td align="right">
+             <button id="nextQuery" class="btn btn-success" data-toggle="modal" data-target="#nextQueryModal"><i class="glyphicon glyphicon-search"></i> Next</button>
+             <button id="save" class="btn btn-danger" data-toggle="modal" data-target="#saveModal" @if(ltrquery.get.qid.get == 0) { disabled="disabled" }><i class="glyphicon glyphicon-save"></i> Save</button>
+             <button id="delete" class="btn btn-warning" data-toggle="modal" data-target="#deleteModal" @if(ltrquery.get.qid.get == 0) { disabled="disabled" }><i class="glyphicon glyphicon-trash"></i> Delete</button>
+           </td>
+         </tr>
+         </table>
+
+         <p>
+         <div id="search_result_msg"></div>
+         </p>
+
+          <!-- Modal -->
+          <div class="modal fade" id="nextQueryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <p>
+                              <strong>Are you sure to query next ?</strong>
+                          </p>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                          <button id="nextQuery-button" type="button" class="btn btn-primary">OK</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Modal -->
+          <div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <p>
+                              <strong>Are you sure to save this relevance degree ?</strong>
+                          </p>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                          <button id="save-button" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <!-- Modal -->
+          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <p>
+                              <strong>Are you sure to delete this query ?</strong>
+                          </p>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                          <button id="delete-button" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+
+      <div class="row">
+          <div class="col-sm-9 col-md-10 main">
+              <table id="search_result_table" class="table"></table>
+          </div>
+      </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="moreModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id ="starsMore"  class="pull-right"></div>
+                <br>
+                <br>
+                <table id="more_table" class="table"></table>
+             </div>
+         </div>
+      </div>
+  </div>
+
+
+<script >
+
+var currentQid = @ltrquery.get.qid;
+var currentQuery = "@ltrquery.get.query";
+var labelMax = @ltr.get.labelMax;
+
+$(document).ready(function() {
+  doSearch();
+});
+
+var stars;
+
+function doSearch() {
+  var table = document.getElementById("search_result_table");
+  while( table.rows[ 0 ] ) table.deleteRow( 0 );
+  stars =  new Array();
+
+  var queryStr = $("#searchText").val()
+  currentQuery = queryStr
+  if (queryStr.trim().length == 0) {
+    $("#search_result_msg").html("<div class=\"alert alert-danger\">No queries.</div>");
+    return;
+   }
+  $("#search_result_msg").html("");
+  var url = "/ltr/annotation/@currentLtrid/search/" + currentQid + "?q=" + encodeURIComponent(queryStr);
+  $.getJSON(url, function(data) {
+	 if (data.status == 0) {
+        if (data.rows.length > 0) {
+          var header = table.insertRow(0);
+          header.insertCell(0).outerHTML = "<th>#</th>";
+          header.insertCell(1).outerHTML = "<th>contents</th>";
+          header.insertCell(2).outerHTML = "<th>relevance degree</th>";
+         }
+        for (var i=0; i<data.rows.length; i++) {
+          var doc = data.rows[i];
+          stars[i] = new Array();
+          stars[i][0] = doc["id"]
+          var label = Number(doc["label"])
+          for(j=1;j <= 5;j++){
+            if (label < j)
+              stars[i][j] = 0;
+             else
+              stars[i][j] = 1;
+          }
+          var row = table.insertRow(i+1);
+          var cell1 = row.insertCell(0);
+          var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+          cell1.innerHTML = i+1;
+          cell2.innerHTML = "<p><span class=\"text-primary\"><b><font size=+1>" + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#moreModal\" data-row=\"" + i + "\" >" + doc["title"] + "</a>" + "</font></b></span>" + "<br><p><span class=\"text-muted\">" + doc["body"] + "</span>" + "<p><span class=\"text-muted\"><button type=\"button\" class=\"btn btn-info btn-xs\" data-toggle=\"modal\" data-target=\"#moreModal\" data-row=\"" + i + "\">more</button></span>";
+          var labelHtml = "";
+          for (var j=1 ; j<=labelMax ; j++){
+            var color;
+            if (label < j)
+              color = 'color:lightgray;'
+            else
+              color = 'color:red;'
+            labelHtml = labelHtml + "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick='onClickStar(" + i + "," + j + ");'><span id=\"star_" + i + "_"+ j + "\" class=\"glyphicon glyphicon-star\" style=\"" + color + "\" aria-hidden=\"true\"></span></button>";
+          }
+          cell3.innerHTML = labelHtml;
+          cell3.style.cssText= 'white-space: nowrap;';
+
+        }
+        if (data.rows.length == 0)
+          $("#search_result_msg").html("<div class=\"alert alert-danger\">Query No Hits.</div>");
+     } else {
+          $("#search_result_msg").html("<div class=\"alert alert-danger\">Search error: " + data.msg + "</div>");
+     }
+
+  })
+  .error(function(jqXHR, textStatus, errorThrown) {
+    $("#search_result_msg").html(textStatus + ": " + errorThrown + "<br>" + jqXHR.responseText);
+  })
+}
+
+function onClickStar(row, label) {
+    var changeToOn = (stars[row][label] == 0);
+    for (j=1;j <= 5;j++) {
+      var elm = document.getElementById("star_" + row + "_" + j);
+      if (j < label || (j == label && changeToOn)) {
+  	    stars[row][j] = 1;
+        elm.style.cssText = 'color:red;';
+  	  } else {
+  		stars[row][j] = 0;
+        elm.style.cssText = 'color:lightgray;';
+  	  }
+	}
+}
+
+var starsOnMoreModal;
+
+function onClickStarOnMoreModal(label) {
+    var changeToOn = (starsOnMoreModal[label] == 0);
+    for (j=1;j <= 5;j++) {
+      var elm = document.getElementById("star_more_" + j);
+      if (j < label || (j == label && changeToOn)) {
+  	    starsOnMoreModal[j] = 1;
+        elm.style.cssText = 'color:red;';
+  	  } else {
+  		starsOnMoreModal[j] = 0;
+        elm.style.cssText = 'color:lightgray;';
+  	  }
+	}
+}
+
+function onClickOKOnMoreModal(row) {
+    for (j=1;j <= 5;j++) {
+        stars[row][j] = starsOnMoreModal[j]
+        var elm = document.getElementById("star_" + row + "_" + j);
+        if (stars[row][j] == 1) {
+            elm.style.cssText = 'color:red;';
+        } else {
+            elm.style.cssText = 'color:lightgray;';
+        }
+    }
+}
+
+$('#moreModal').on('show.bs.modal', function (event) {
+    var table = document.getElementById("more_table");
+    while( table.rows[ 0 ] ) table.deleteRow( 0 );
+    var button = $(event.relatedTarget);
+    var rowIdx = button.data('row');
+    //
+    starsOnMoreModal = stars[rowIdx].concat();
+    var label = 0;
+    for (var j=1; j<=starsOnMoreModal.length; j++) {
+        if (starsOnMoreModal[j] == 1) label++;
+    }
+    var labelHtml = "";
+    for (var j=1 ; j<=labelMax ; j++){
+        var color;
+        if (label < j)
+            color = 'color:lightgray;'
+        else
+            color = 'color:red;'
+        labelHtml = labelHtml + "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick='onClickStarOnMoreModal(" + j + ");'><span id=\"star_more_" + j + "\" class=\"glyphicon glyphicon-star\" style=\"" + color + "\" aria-hidden=\"true\"></span></button>";
+    }
+    labelHtml = labelHtml + "&nbsp;&nbsp;<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\" onclick='onClickOKOnMoreModal(" + rowIdx + ");'>OK</button>";
+    labelHtml = labelHtml + "&nbsp;<button type=\"button\" class=\"btn btn-primary\" data-dismiss=\"modal\">Cancel</button>";
+    $("#starsMore").html(labelHtml);
+    //
+    var docid = stars[rowIdx][0];
+    var url = "/ltr/annotation/@currentLtrid/searchById?id=" + encodeURIComponent(docid);
+    $.getJSON(url, function(data) {
+        var i = 0;
+        for(var key in data) {
+            var row1 = table.insertRow(i);
+            var cell1 = row1.insertCell(0);
+            var cell2 = row1.insertCell(1);
+            cell1.innerHTML = key;
+            if (data[key].constructor === Array) {
+                cell2.innerHTML = data[key].join("<br>");
+            } else {
+                cell2.innerHTML = data[key];
+            }
+            i++;
+        }
+    })
+});
+
+$('#search-button').on('click', function(event) {
+  doSearch();
+});
+
+$('#nextQuery-button').on('click', function(event) {
+	window.location.href = "/ltr/annotation/@currentLtrid/next/" + currentQid
+});
+
+$('#save-button').on('click', function(event) {
+	var saveLabels = new Array();
+	for (var i in stars) {
+        var star = stars[i];
+        var cnt = 0;
+    	for (var j=1; j<=star.length; j++) {
+    	    if (star[j] == 1) cnt++;
+    	}
+	    var each = {
+            docId: star[0],
+            label: cnt
+    	};
+    	 saveLabels.push(each);
+	};
+	var saveQid = currentQid;
+	if (currentQid > 0 && currentQuery != "@ltrquery.get.query") {
+	  // if search text has been changed, save it as a new query.
+      saveQid = 0;
+	}
+    var url = "/ltr/annotation/@currentLtrid/save/" + saveQid;
+	var obj = { query: currentQuery, labels: saveLabels }
+	var json_text = JSON.stringify(obj);
+    $.ajax({
+        type: "post",
+        url: url,
+        data: json_text,
+        contentType: 'application/json',
+        dataType: "json",
+        success: function(json_data) {
+                if (saveQid == 0) {
+                  $("#search_result_msg").html("<div class=\"alert alert-danger\">Saved as New Query successfully.</div>");
+                  currentQid = json_data.qid
+                } else
+                  $("#search_result_msg").html("<div class=\"alert alert-danger\">Saved successfully.</div>");
+                $("#saved_count").html(json_data.saved);
+                $("#total_count").html(json_data.total);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#search_result_msg").html(textStatus + ": " + errorThrown + "<br>" + jqXHR.responseText);
+        }
+    });
+});
+
+$('#delete-button').on('click', function(event) {
+    $.ajax({
+      url: "/ltr/annotation/@currentLtrid/delete/" + currentQid,
+      type: 'DELETE',
+        success: function(json_data) {
+        	window.location.href = "/ltr/annotation/@currentLtrid/next/" + currentQid
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $("#search_result_msg").html(textStatus + ": " + errorThrown + "<br>" + jqXHR.responseText);
+        }
+     });
+});
+
+</script>
+
+}

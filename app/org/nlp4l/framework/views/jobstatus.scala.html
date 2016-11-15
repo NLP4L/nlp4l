@@ -1,0 +1,73 @@
+@headerAddon = {
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<script src='@routes.Assets.versioned("javascripts/framework/jobstatus.js")' type="text/javascript"></script>
+<script>
+  function StatusFormatter(value, row){
+	if(value == "Running") {
+		return "<h4><span class=\"label label-warning\">"+value+"</span></h4>"
+	} else if(value == "Error") {
+		return "<h4><span class=\"label label-danger\">"+value+"</span></h4>"
+	} else {
+		return "<h4><span class=\"label label-success\">"+value+"</span></h4>"
+	}
+  }
+  function JobIdFormatter(value, row){
+		return "<a href=\"/dashboard/job/"+value+"\">"+value+"</a>"
+  }
+  function RunIdFormatter(value, row){
+	  	runId = value.split('/')[1]
+		return "<a href=\"/dashboard/job/result/"+value+"\">"+runId+"</a>"
+  }
+</script>
+}
+
+@main(headerAddon) {
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-9 col-md-10 main">
+        <h1 class="page-header">Job Status</h1>
+        
+        <table id="table"
+           data-toggle="table"
+           data-pagination="true"
+           data-pagination-first-text="First"
+           data-pagination-pre-text="Prev"
+           data-pagination-next-text="Next"
+           data-pagination-last-text="Last"
+           data-id-field="id"
+           data-side-pagination="server"
+           data-url="/job/status">
+          <thead>
+            <tr>
+              <th data-field="status" data-formatter="StatusFormatter">Status</th>
+              <th data-field="jobId" data-formatter="JobIdFormatter">JobID</th>
+              <th data-field="runId" data-formatter="RunIdFormatter">RunID</th>
+              <th data-field="total">Total</th>
+              <th data-field="done">Done</th>
+              <th data-field="message">Message</th>
+            </tr>
+          </thead>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+}

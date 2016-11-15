@@ -1,0 +1,194 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltrconfigs: Seq[Ltrconfig], ltr: Option[Ltrconfig], success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/config.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+	
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li><a href="/ltrdashboard/@currentLtrid/config/new">&lt;&lt; New &gt;&gt; <span class="sr-only"/></a></li>
+
+          @for(aLtr <- ltrconfigs) {
+          <li><a href="/ltrdashboard/@currentLtrid/config/@aLtr.ltrid">@aLtr.name <span class="sr-only"/></a></li>
+          }
+          
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-md-10 main">
+
+        <form id="inputform" data-toggle="validator" class="form-horizontal">
+          <div class="button_wrapper">
+            <div class="row">
+			  <div class="col-md-4">
+                <button id="load-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#loadModal"><i class="glyphicon glyphicon-play"></i> Load</button>
+              </div>
+              <div class="col-md-4">
+                <button id="save-button" type="button" class="btn btn-primary" disabled><i class="glyphicon glyphicon-save"></i> Save</button>
+              </div>
+              <div class="col-md-4">
+                <button id="delete-button" type="button" class="btn btn-warning" data-toggle="modal" data-target="#deleteModal"><i class="glyphicon glyphicon-remove"></i> Delete</button>
+              </div>
+            </div>
+            <!-- Modal -->
+	          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to delete this config?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button id="delete-ltrconfig" type="button" class="btn btn-primary">OK</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+            <!-- Modal -->
+          </div><!-- button_wrapper -->
+          <br/>
+          
+          <div class="input_wrapper">
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="name">Name</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="name" value="@ltr.map(d => d.name).getOrElse("")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="annotationType">Annotation Type</label>
+          			<div class="col-sm-10">
+          				<select class="form-control" id="annotationType" required >
+          					<option value="pointwise" @if(ltr.map(d => d.annotationType).getOrElse("") == "pointwise") { selected }>pointwise</option>
+          				</select>
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="labelMax">Relevance Degree</label>
+          			<div class="col-sm-10">
+          				<select class="form-control" id="labelMax" required >
+          					<option value="1" @if(ltr.map(d => d.labelMax).getOrElse("") == 1) { selected }>0 to 1</option>
+          					<option value="2" @if(ltr.map(d => d.labelMax).getOrElse("") == 2) { selected }>0 to 2</option>
+          					<option value="3" @if(ltr.map(d => d.labelMax).getOrElse(3) ==  3) { selected }>0 to 3</option>
+          					<option value="4" @if(ltr.map(d => d.labelMax).getOrElse("") == 4) { selected }>0 to 4</option>
+          					<option value="5" @if(ltr.map(d => d.labelMax).getOrElse("") == 5) { selected }>0 to 5</option>
+          				</select>
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="trainerFactoryClassName">Trainer Factory Class</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="trainerFactoryClassName" value="@ltr.map(d => d.trainerFactoryClassName).getOrElse("org.nlp4l.ltr.support.procs.PRankTrainerFactory")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="trainerFactoryClassSettings">- settings</label>
+          			<div class="col-sm-10">
+          				<textarea class="form-control" id="trainerFactoryClassSettings" rows="1" />@ltr.map(d => d.trainerFactoryClassSettings).getOrElse("{ \"numIterations\": 2000 }")</textarea>
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="searchUrl">Search URL</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="searchUrl" value="@ltr.map(d => d.searchUrl).getOrElse("http://localhost:8983/solr/collection1/select?q=${query}&wt=json")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="featureExtractUrl">Feature Extract URL</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="featureExtractUrl" value="@ltr.map(d => d.featureExtractUrl).getOrElse("http://localhost:8983/solr/collection1/features")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="featureExtractConfig">Feature Extract Config</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="featureExtractConfig" value="@ltr.map(d => d.featureExtractConfig).getOrElse("ltr_features.conf")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="docUniqField">Document Unique Field</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="docUniqField" value="@ltr.map(d => d.docUniqField).getOrElse("id")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="docTitleField">Document Title Field</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="docTitleField" value="@ltr.map(d => d.docTitleField).getOrElse("title")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="docBodyField">Document Body Field</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="docBodyField" value="@ltr.map(d => d.docBodyField).getOrElse("body")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="deployerFactoryClassName">Deployer Factory Class</label>
+          			<div class="col-sm-10">
+          				<input type="text" class="form-control" id="deployerFactoryClassName" value="@ltr.map(d => d.deployerFactoryClassName).getOrElse("org.nlp4l.ltr.support.procs.HttpFileTransferDeployerFactory")" required />
+          			</div>
+          		</div>
+          	</div><!-- row -->
+          	<div class="row">
+          		<div class="form-group">
+          			<label class="col-sm-2 control-label" for="deployerFactoryClassSettings">- settings</label>
+          			<div class="col-sm-10">
+          				<textarea class="form-control" id="deployerFactoryClassSettings" rows="1" />@ltr.map(d => d.deployerFactoryClassSettings).getOrElse("{ \"deployToUrl\": \"http://localhost:8983/solr/nlp4l/receive/file\", \"deployToFile\": \"collection1/conf/ltr_model.conf\" }")</textarea>
+          			</div>
+          		</div>
+          	</div><!-- row -->
+
+          </div><!-- input_wrapper -->
+          
+        </form>
+        
+      </div>
+    </div>
+  </div>
+
+}
+

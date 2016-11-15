@@ -1,0 +1,264 @@
+@import org.nlp4l.framework.builtin.Job
+@(job: Job, jobId: Int, runId: Int, runIdList: Seq[Int], listTable: String, addForm: String, editForm: String, hasValidators: Boolean, hasWriter: Boolean, hasDeployer: Boolean)
+
+@headerAddon = {
+  <script src='@routes.Assets.versioned("javascripts/framework/jobresult.js")' type="text/javascript"></script>
+<script>
+  function RecordIdFormatter(value, row){
+	//row contains the returned object which applied to current row.s
+	return '<a href="#" data-toggle="modal" data-target="#modRecordModal" data-id="'+ row.id + '">' + row.id + '</a>';
+  }
+  $(function(){
+    $('#modRecordModal').on('show.bs.modal', function (event) {
+	  var button = $(event.relatedTarget) // Button that triggered the modal
+	  var recordId = button.data('id') // Extract info from data-* attributes
+	  var url = location.pathname.split('/')
+	  var runId = url.pop()
+	  var jobId = url.pop()
+	  var modal = $(this)
+	  $.getJSON(
+		  "/job/result/record/"+jobId+"/"+runId+"/"+recordId, 
+		  null,
+		  function(data, status) {
+			  for (var key in data.record) {
+			    modal.find('#form_'+key).val(data.record[key])
+			  }
+		  }
+		);
+	})
+
+
+	$('#validateModal').on('show.bs.modal', function (event) {
+	  $('#validateResult').html("<button class=\"btn btn-lg btn-primary\"><span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Validaing...</button>")
+	  var button = $(event.relatedTarget) // Button that triggered the modal
+	  var url = location.pathname.split('/')
+	  var runId = url.pop()
+	  var jobId = url.pop()
+	  var modal = $(this)
+	  $.getJSON(
+		  "/job/result/validate/"+jobId+"/"+runId,
+		  null,
+		  function(data, status) {
+			  if(data.status == false) {
+				  var err = "<div class=\"alert alert-danger\" role=\"alert\"><p>Error</p><ul>"
+				  for (var key in data.messages) {
+				    err += "<li>" + data.messages[key] + "</li>"
+				  }
+				  err += "</ul></div>"
+				  $('#validateResult').html(err)
+			  } else {
+				  $('#validateResult').html("<div class=\"alert alert-success\" role=\"alert\">Success</div>")
+			  }
+		  }
+		);
+	})
+	
+	
+	$('#deployModal').on('show.bs.modal', function (event) {
+	  $('#deployResult').html("<button class=\"btn btn-lg btn-info\"><span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Deploying...</button>")
+	  var button = $(event.relatedTarget) // Button that triggered the modal
+	  var url = location.pathname.split('/')
+	  var runId = url.pop()
+	  var jobId = url.pop()
+	  var modal = $(this)
+	  $.getJSON(
+		  "/job/result/deploy/"+jobId+"/"+runId,
+		  null,
+		  function(data, status) {
+			  if(data.status == false) {
+				  var err = "<div class=\"alert alert-danger\" role=\"alert\"><p>Error</p><ul>"
+				  for (var key in data.messages) {
+				    err += "<li>" + data.messages[key] + "</li>"
+				  }
+				  err += "</ul></div>"
+				  $('#deployResult').html(err)
+			  } else {
+				  $('#deployResult').html("<div class=\"alert alert-success\" role=\"alert\">Success</div>")
+			  }
+		  }
+		);
+	})
+  });
+</script>
+}
+
+@main(headerAddon) {
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li><a href="/dashboard/job/@job.jobId">Job Info <span class="sr-only"/></a></li>
+		  @for(runId <- runIdList) {
+          <li><a href="/dashboard/job/result/@job.jobId/@runId">#@runId<span class="sr-only"/></a></li>
+          }
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-md-10 main">
+      <div class="row">
+        <div class="col-md-4"><h3>@job.name #@runId</h3></div>
+        <div class="col-md-2">
+            @if(hasWriter) {
+          <form id="exportform" name="exportform">
+                  <button id="export-button" type="button" class="btn btn-success">
+                    <i class="glyphicon glyphicon-download-alt"></i> Download
+                  </button>
+          </form>
+            }
+        </div>
+        <div class="col-md-2">
+        @if(hasValidators) {
+          <button id="validate-button" class="btn btn-primary" data-toggle="modal" data-target="#validateModal"><i class="glyphicon glyphicon-check"></i> Validate</button>
+        }
+        </div>
+        <div class="col-md-2">
+        @if(hasDeployer) {
+          <button id="deploy-button" class="btn btn-info" data-toggle="modal" data-target="#deployConfirmModal" ><i class="glyphicon glyphicon-upload"></i> Deploy</button>
+        }
+        </div>
+        <div class="col-md-2">
+          <button id="delete" type="button" class="btn btn-warning" data-toggle="modal" data-target="#deleteModal"><i class="glyphicon glyphicon-remove"></i> Delete this result</button>
+        </div>
+      </div>
+      
+        
+        <!-- Modal -->
+	          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to delete this result?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button id="delete-result" type="button" class="btn btn-primary">OK</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+        <!-- Modal -->
+        
+        @Html(addForm)
+        
+        <hr>
+        <div id="toolbar">
+          <button id="deleteRecord" type="button" class="btn btn-warning" data-toggle="modal" data-target="#deleteRecordModal">
+              <i class="glyphicon glyphicon-remove"></i> Delete
+          </button>
+          <!-- Modal -->
+          <div class="modal fade" id="deleteRecordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <p>
+                    <strong>Are you sure to delete record?</strong>
+                  </p>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button id="delete-record" type="button" class="btn btn-primary">OK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal -->
+        </div>
+        @Html(listTable)
+        <!-- Modal -->
+          <div class="modal fade" id="modRecordModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+              
+              <div class="modal-content">
+                <div class="modal-header">
+			        <h4 class="modal-title" id="gridSystemModalLabel">Edit the record</h4>
+			    </div>
+                <div class="modal-body">
+                  <p>
+                    
+                    @Html(editForm)
+                    
+                    
+                  </p>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button id="editrecord-button" type="button" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal -->
+          
+          <!-- Modal -->
+          <div class="modal fade" id="validateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+              
+              <div class="modal-content">
+                <div class="modal-header">
+			        <h4 class="modal-title" id="gridSystemModalLabel">Validate</h4>
+			    </div>
+                <div class="modal-body">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <p id="validateResult">
+						<button class="btn btn-lg btn-primary"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Validaing...</button>
+                  </p>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal -->
+
+        <!-- Modal -->
+	          <div class="modal fade" id="deployConfirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to deploy this result?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#deployModal" >Deploy</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+        <!-- Modal -->
+        
+        
+          <!-- Modal -->
+          <div class="modal fade" id="deployModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog modal-lg" role="document">
+              
+              <div class="modal-content">
+                <div class="modal-header">
+			        <h4 class="modal-title" id="gridSystemModalLabel">Deploy</h4>
+			    </div>
+                <div class="modal-body">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  <p id="deployResult">
+						<button class="btn btn-lg btn-info"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Deploying...</button>
+                  </p>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal -->
+      </div>
+    </div>
+  </div>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->

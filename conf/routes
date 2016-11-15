@@ -1,0 +1,104 @@
+#
+# Copyright 2015 org.NLP4L
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Top menu
+GET           /                                         @org.nlp4l.framework.controllers.Dashboard.topmenu
+
+# Map static resources from the /public folder to the /assets URL path
+GET           /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
+GET           /webjars/*file                            controllers.WebJarAssets.at(file)
+
+
+# framework
+GET           /dashboard                                        @org.nlp4l.framework.controllers.Dashboard.index
+GET           /dashboard/job/list                               @org.nlp4l.framework.controllers.Dashboard.joblist
+GET           /dashboard/job/new                                @org.nlp4l.framework.controllers.Dashboard.newJob
+GET           /dashboard/job/status                             @org.nlp4l.framework.controllers.Dashboard.jobstatus
+GET           /dashboard/job/:jobId                             @org.nlp4l.framework.controllers.Dashboard.editJob(jobId: Int, runId: Int = 0)
+GET           /dashboard/job/result/:jobId/:runId               @org.nlp4l.framework.controllers.Dashboard.jobresult(jobId: Int, runId: Int)
+POST          /dashboard/job/result/:jobId/:runId               @org.nlp4l.framework.controllers.Dashboard.jobresult(jobId: Int, runId: Int)
+
+GET           /job/list                                         @org.nlp4l.framework.controllers.JobController.list
+GET           /job/status                                       @org.nlp4l.framework.controllers.JobController.jobStatus
+POST          /job/exec/:jobId                                  @org.nlp4l.framework.controllers.JobController.exec(jobId: Int)
+GET           /job/delete/:jobId                                @org.nlp4l.framework.controllers.JobController.deleteJob(jobId: Int)
+DELETE        /job/:jobId                                       @org.nlp4l.framework.controllers.JobController.deleteJob(jobId: Int)
+POST          /job/info                                         @org.nlp4l.framework.controllers.JobController.saveJobInfo(jobId: Int = 0)
+PUT           /job/info/:jobId                                  @org.nlp4l.framework.controllers.JobController.saveJobInfo(jobId: Int)
+POST          /job/config/:jobId                                @org.nlp4l.framework.controllers.JobController.saveJobConfig(jobId: Int)
+POST          /job/config                                       @org.nlp4l.framework.controllers.JobController.saveNewJobConfig
+GET           /job/result/:jobId/:runId                         @org.nlp4l.framework.controllers.JobController.jobResult(jobId: Int, runId: Int)
+GET           /job/result/delete/:jobId/:runId                  @org.nlp4l.framework.controllers.JobController.deleteRunResult(jobId: Int, runId: Int)
+DELETE        /job/result/:jobId/:runId                         @org.nlp4l.framework.controllers.JobController.deleteRunResult(jobId: Int, runId: Int)
+GET           /job/result/record/:jobId/:runId/:recordId        @org.nlp4l.framework.controllers.JobController.fetchRecord(jobId: Int, runId: Int, recordId: Int)
+GET           /job/result/record/delete/:jobId/:runId/:recordId @org.nlp4l.framework.controllers.JobController.deleteRecord(jobId: Int, runId: Int, recordId: Int)
+DELETE        /job/result/record/:jobId/:runId/:recordId        @org.nlp4l.framework.controllers.JobController.deleteRecord(jobId: Int, runId: Int, recordId: Int)
+POST          /job/result/record/add/:jobId/:runId              @org.nlp4l.framework.controllers.JobController.addRecord(jobId: Int, runId: Int)
+POST          /job/result/record/update/:jobId/:runId/:recordId @org.nlp4l.framework.controllers.JobController.updateRecord(jobId: Int, runId: Int, recordId: Int)
+GET           /job/result/validate/:jobId/:runId                @org.nlp4l.framework.controllers.JobController.validateResult(jobId: Int, runId: Int)
+GET           /job/result/deploy/:jobId/:runId                  @org.nlp4l.framework.controllers.JobController.deployResult(jobId: Int, runId: Int)
+GET           /job/result/export/:jobId/:runId                  @org.nlp4l.framework.controllers.JobController.exportResult(jobId: Int, runId: Int)
+GET           /job/result/filterlist/:jobId/:runId/:cellname    @org.nlp4l.framework.controllers.JobController.filterList(jobId: Int, runId: Int, cellname: String)
+
+GET           /searchResult/solr/:url/:collection/:encodedQuery @org.nlp4l.framework.controllers.SearchResult.searchResultSolr(url: String, collection: String, encodedQuery: String)
+GET           /search/solr/:encodedUrl/:collection/:encodedQuery       @org.nlp4l.framework.controllers.SearchResult.searchBySolr(encodedUrl: String, collection: String, encodedQuery: String)
+
+
+# ltr
+GET           /ltrdashboard                                            @org.nlp4l.ltr.support.controllers.LtrDashboard.index(ltrid: Int = 0)
+GET           /ltrdashboard/$ltrid<[0-9]+>                             @org.nlp4l.ltr.support.controllers.LtrDashboard.index(ltrid: Int)
+GET           /ltrdashboard/config                                     @org.nlp4l.ltr.support.controllers.LtrDashboard.config(ltrid: Int = 0)
+GET           /ltrdashboard/$ltrid<[0-9]+>/config                      @org.nlp4l.ltr.support.controllers.LtrDashboard.config(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/config/$target<[0-9]+>      @org.nlp4l.ltr.support.controllers.LtrDashboard.editConfig(ltrid: Int, target: Int)
+GET           /ltrdashboard/config/new                                 @org.nlp4l.ltr.support.controllers.LtrDashboard.newConfig(ltrid: Int = 0)
+GET           /ltrdashboard/$ltrid<[0-9]+>/config/new                  @org.nlp4l.ltr.support.controllers.LtrDashboard.newConfig(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/query                       @org.nlp4l.ltr.support.controllers.LtrDashboard.query(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/annotation                  @org.nlp4l.ltr.support.controllers.LtrDashboard.annotation(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/annotation/$qid<[0-9]+>     @org.nlp4l.ltr.support.controllers.LtrDashboard.editAnnotation(ltrid: Int, qid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/feature                     @org.nlp4l.ltr.support.controllers.LtrDashboard.feature(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/training                    @org.nlp4l.ltr.support.controllers.LtrDashboard.training(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/training/new                @org.nlp4l.ltr.support.controllers.LtrDashboard.newTraining(ltrid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/training/$mid<[0-9]+>       @org.nlp4l.ltr.support.controllers.LtrDashboard.trainingStatus(ltrid: Int, mid: Int)
+
+
+
+
+POST          /ltr/config                                              @org.nlp4l.ltr.support.controllers.LtrController.saveLtrConfig(ltrid: Int = 0)
+POST          /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.saveLtrConfig(ltrid: Int)
+DELETE        /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.deleteLtrConfig(ltrid: Int)
+POST          /ltr/query/$ltrid<[0-9]+>                                @org.nlp4l.ltr.support.controllers.LtrController.saveQuery(ltrid: Int)
+POST          /ltr/query/$ltrid<[0-9]+>/clear                          @org.nlp4l.ltr.support.controllers.LtrController.clearAllAnnotation(ltrid: Int)
+POST          /ltr/query/$ltrid<[0-9]+>/clear/$qid<[0-9]+>             @org.nlp4l.ltr.support.controllers.LtrController.clearAnnotation(ltrid: Int, qid: Int)
+GET           /ltr/query/$ltrid<[0-9]+>/list                           @org.nlp4l.ltr.support.controllers.LtrController.listQuery(ltrid: Int)
+DELETE        /ltr/query/$ltrid<[0-9]+>/delete/$qid<[0-9]+>            @org.nlp4l.ltr.support.controllers.LtrController.deleteQuery(ltrid: Int, qid: Int)
+GET           /ltr/annotation/$ltrid<[0-9]+>/search/$qid<[0-9]+>       @org.nlp4l.ltr.support.controllers.LtrController.search(ltrid: Int, qid: Int)
+GET           /ltr/annotation/$ltrid<[0-9]+>/searchById                @org.nlp4l.ltr.support.controllers.LtrController.searchById(ltrid: Int)
+GET           /ltr/annotation/$ltrid<[0-9]+>/next/$qid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.nextQuery(ltrid: Int, qid: Int)
+POST          /ltr/annotation/$ltrid<[0-9]+>/save/$qid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.saveLabels(ltrid: Int, qid: Int)
+DELETE        /ltr/annotation/$ltrid<[0-9]+>/delete/$qid<[0-9]+>       @org.nlp4l.ltr.support.controllers.LtrController.deleteQuery(ltrid: Int, qid: Int)
+GET           /ltr/feature/$ltrid<[0-9]+>                              @org.nlp4l.ltr.support.controllers.LtrController.startFeatureEtraction(ltrid: Int)
+GET           /ltr/feature/$ltrid<[0-9]+>/progress                     @org.nlp4l.ltr.support.controllers.LtrController.getFeatureProgress(ltrid: Int)
+GET           /ltr/feature/$ltrid<[0-9]+>/message                      @org.nlp4l.ltr.support.controllers.LtrController.getFeatureProgressMessage(ltrid: Int)
+GET           /ltr/feature/$ltrid<[0-9]+>/clear                        @org.nlp4l.ltr.support.controllers.LtrController.clearFeatureProgress(ltrid: Int)
+GET           /ltr/training/$ltrid<[0-9]+>                             @org.nlp4l.ltr.support.controllers.LtrController.startTraining(ltrid: Int)
+GET           /ltr/training/$ltrid<[0-9]+>/progress/$runid<[0-9]+>     @org.nlp4l.ltr.support.controllers.LtrController.getTrainingProgress(ltrid: Int, runid: Int)
+DELETE        /ltr/training/$ltrid<[0-9]+>/delete/$mid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.deleteTraining(ltrid: Int, mid: Int)
+GET           /ltr/training/$ltrid<[0-9]+>/deploy/$mid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.deployModel(ltrid: Int, mid: Int)
+

@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# nlp4l    NLP4L framework
+#
+# chkconfig: 2345 80 30
+# processname: nlp4l
+
+# Source function library.
+. /etc/init.d/functions
+
+prog="nlp4l"
+LOCKFILE=/var/lock/subsys/$prog
+
+NLP4L_DIR=/usr/local/nlp4l/nlp4l-latest
+NLP4L_USER=nlp4l
+NLP4L_COMMAND=$NLP4L_DIR/bin/nlp4l-framework
+NLP4L_LOG=/var/log/nlp4l/$prog.log
+
+PID_FILE=$NLP4L_DIR/RUNNING_PID
+
+start() {
+    if [ -e $PID_FILE ]; then
+        echo $"NLP4L is already running (Or delete $PID_FILE file.)"
+        exit 2
+    fi
+
+    echo -n $"Starting $prog: "
+    sudo -u $NLP4L_USER $NLP4L_COMMAND > $NLP4L_LOG 2>&1 &
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $LOCKFILE
+    echo
+    return $RETVAL
+}
+
+stop() {
+    if [ ! -e $PID_FILE ]; then
+        echo $"NLP4L is not running."
+        exit 2
+    fi
+
+    echo -n $"Shutting down $prog: "
+    killproc -p $PID_FILE $prog
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f $LOCKFILE
+    echo
+    return $RETVAL
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage $0 {start|stop|restart}"
+        exit 2 
+esac

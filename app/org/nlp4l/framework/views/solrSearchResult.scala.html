@@ -1,0 +1,72 @@
+@(encodedUrl: String, collection: String, encodedQuery: String, query: String, idField: String, hlField: Option[String])
+
+<!--
+ Copyright 2016 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@headerAddon = {
+}
+
+@main(headerAddon) {
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-9 col-md-10 main">
+            <h1 class="page-header">Search Result [@query]</h1>
+
+            @if(hlField == None){
+              <table id="table"
+                     data-toggle="table"
+                     data-pagination="true"
+                     data-pagination-first-text="First"
+                     data-pagination-pre-text="Prev"
+                     data-pagination-next-text="Next"
+                     data-pagination-last-text="Last"
+                     data-id-field="id"
+                     data-side-pagination="server"
+                     data-url="/search/solr/@encodedUrl/@collection/@encodedQuery?id=@idField">
+                  <thead>
+                  <tr>
+                      <th data-field="@idField">@idField</th>
+                  </tr>
+                  </thead>
+              </table>
+            } else {
+              <table id="table"
+                     data-toggle="table"
+                     data-pagination="true"
+                     data-pagination-first-text="First"
+                     data-pagination-pre-text="Prev"
+                     data-pagination-next-text="Next"
+                     data-pagination-last-text="Last"
+                     data-id-field="id"
+                     data-side-pagination="server"
+                     data-escape="false"
+                     data-url="/search/solr/@encodedUrl/@collection/@encodedQuery?id=@idField&amp;hl=@hlField.get">
+                  <thead>
+                  <tr>
+                      <th data-field="@idField">@idField</th>
+                      <th data-field="@hlField.get">@hlField.get</th>
+                  </tr>
+                  </thead>
+              </table>
+            }
+
+        </div>
+    </div>
+</div>
+
+}

@@ -1,0 +1,57 @@
+@(headerAddon: Html)(content: Html)
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NLP4L - Framework</title>
+  <link rel="stylesheet" media="screen" href='@routes.Assets.versioned("../../../../../public/stylesheets/main.css")'>
+  <link rel="stylesheet" media="screen" href='@routes.Assets.versioned("stylesheets/dashboard.css")'>
+  <link rel="shortcut icon" type="image/png" href='@routes.Assets.versioned("../../../../../public/images/favicon.png")'>
+  <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
+  <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+  <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+  <link rel="stylesheet" href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.css'>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js'></script>
+  <script src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/extensions/editable/bootstrap-table-editable.js'></script>
+  <script src='/assets/javascripts/bootstrap-table/1.10.0/extensions/filter-control/bootstrap-table-filter-control-bugfix.js'></script>
+  @headerAddon
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header" style="background-color: #fff;">
+        <a class="bavbar-brand" href="/">
+          <img src="/assets/images/NLP4L-logo.png" width="50" />
+        </a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="/dashboard/job/list">Job List</a></li>
+          <li><a href="/dashboard/job/new">New Job</a></li>
+          <li><a href="/dashboard/job/status">Job Status</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  @content
+  
+</body>
+</html>

@@ -1,0 +1,214 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], ltrmodels: Seq[Ltrmodel], features: Seq[String], ltrmodel: Ltrmodel, success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/training.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+	
+  <div class="container-fluid">
+    <form id="modelform" data-toggle="validator" method="post">
+    <div class="row">
+      <div class="col-md-6">
+          <p class="text-success">@success</p>
+          <p class="text-danger">@error</p>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a href="/ltrdashboard/@currentLtrid/training/new">&lt;&lt; New &gt;&gt;  <span class="sr-only"/></a></li>
+
+                @for(aLtrModel <- ltrmodels) {
+                <li><a href="/ltrdashboard/@currentLtrid/training/@aLtrModel.mid">#@aLtrModel.runid <span class="sr-only"/></a></li>
+                }
+
+            </ul>
+        </div>
+
+
+        <div class="col-sm-9 col-md-10 main">
+
+            <div class="row">
+                <div class="col-sm-3 col-md-2">
+                    <p>Training Status (<span id="pv" style="color:#00b200">@ltrmodel.progress</span>)%</p>
+                    <span id="status"><h4><span class=\"label label-success\">&nbsp;</span></h4></span>
+                </div>
+                <div class="col-sm-9 col-md-10">
+                    <progress value="0" id="p" max=100 style="margin: 5px; height: 30px; width: 100%;-webkit-appearance: none; -moz-appearance: none; appearance: none;"></progress>
+                </div>
+            </div>
+                <p><table><tr><td>Start Time:</td><td> @ltrmodel.started_at</td></tr><tr><td>End Time:</td><td> @ltrmodel.finished_at</td></tr></table></p>
+                <p style="margin: 30px; width: 90%;" class="text-danger" id="errormsg">@error</p>
+
+            <div class="row">
+                <div class="col-sm-2">
+                    <button id="deploy-button" type="button" class="btn btn-info" data-toggle="modal" data-target="#deployModal" @if(ltrmodel.status!=1) { disabled }><i class="glyphicon glyphicon-upload"></i> Deploy</button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="deployModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <p>
+                                        <strong>Are you sure to deploy this model?</strong>
+                                    </p>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button id="deploy" type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#deployResultModal">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="deployResultModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+
+                      <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="gridSystemModalLabel">Deploy</h4>
+                        </div>
+                        <div class="modal-body">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <p>
+                          <p id="deployResult">
+                                <button class="btn btn-lg btn-info"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Deploying...</button>
+                          </p>
+
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <!-- Modal -->
+
+                <div class="col-sm-2 pull-right">
+                    <button id="delete-button" type="button" class="btn btn-warning pull-right" data-toggle="modal" data-target="#deleteModal" @if(ltrmodel.status==0) { disabled }><i class="glyphicon glyphicon-trash"></i> Delete</button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <p>
+                                        <strong>Are you sure to delete this model?</strong>
+                                    </p>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button id="delete" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <h3>Features</h3>
+
+            <ul>
+            @for(aFeature <- features) {
+                <li>@aFeature</il>
+            }
+            </ul>
+
+            <h3>Model Data</h3>
+             <pre id="model_data">@ltrmodel.model_data</pre>
+
+        </div>
+    </div>
+    </form>
+
+  </div>
+
+  <script>
+	var progressBar = document.getElementById('p');
+	var progressValue = document.getElementById('pv');
+	var progressStatus = document.getElementById('status');
+	var errorMsg = document.getElementById('errormsg');
+
+	function updateProgress() {
+		getProgressValue().done(function(result) {
+			var newValue = result;
+			if (newValue >= 100 || newValue < 0) {
+            	window.location.href = "/ltrdashboard/@currentLtrid/training/@ltrmodel.mid.get";
+				return;
+			}
+			progressBar.value = newValue;
+			progressValue.innerHTML = newValue;
+    		progressStatus.innerHTML = "<h4><span class=\"label label-warning\">RUNNING</span></h4>";
+			setTimeout(function() {
+				updateProgress();
+			}, 1000);
+		});
+	}
+
+	function getProgressValue() {
+		return $.ajax({
+			type : 'GET',
+			url : '/ltr/training/@currentLtrid/progress/@ltrmodel.runid'
+		});
+	}
+    function updateStatus() {
+        var status = @ltrmodel.status;
+        var progress = @ltrmodel.progress;
+        if (status < 0) {
+		   	progressBar.value = 0;
+			progressValue.innerHTML = -1;
+		   	progressStatus.innerHTML = "<h4><span class=\"label label-danger\">ERROR</span></h4>";
+			errorMsg.innerHTML = "@ltrmodel.message";
+		   	return;
+        }
+        if (status != 0) {
+			progressBar.value = 100;
+			progressValue.innerHTML = 100;
+			progressStatus.innerHTML = "<h4><span class=\"label label-success\">DONE</span></h4>";
+			errorMsg.innerHTML = "";
+		} else {
+    		updateProgress();
+    	}
+    }
+    updateStatus();
+
+    $('#deployResultModal').on('show.bs.modal', function (event) {
+	  $('#deployResult').html("<button class=\"btn btn-lg btn-info\"><span class=\"glyphicon glyphicon-refresh glyphicon-refresh-animate\"></span> Deploying...</button>")
+	  var button = $(event.relatedTarget) // Button that triggered the modal
+	  var url = location.pathname.split('/')
+      var mid = url.pop()
+      url.pop()
+      var ltrid = url.pop()
+	  var modal = $(this)
+	  $.getJSON(
+        '/ltr/training/' + ltrid + '/deploy/' + mid,
+        null,
+    	function(data, status) {
+          if(data.status == false) {
+              var err = "<div class=\"alert alert-danger\" role=\"alert\"><p>Error</p><ul>"
+              for (var key in data.messages) {
+                err += "<li>" + data.messages[key] + "</li>"
+              }
+              err += "</ul></div>"
+              $('#deployResult').html(err)
+          } else {
+              $('#deployResult').html("<div class=\"alert alert-success\" role=\"alert\">Success</div>")
+          }
+		}
+	  );
+	})
+
+</script>
+
+}
+

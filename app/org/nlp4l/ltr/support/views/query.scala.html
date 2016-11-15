@@ -1,0 +1,155 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/query.js")" type="text/javascript"></script>
+<script>
+  function RowNumFormatter(value, row, index){
+        var tableOptions = $('#table').bootstrapTable('getOptions');
+        var rowNum = ((tableOptions.pageNumber-1) * tableOptions.pageSize)+(1 + index);
+		return rowNum
+  }
+  function QueryFormatter(value, row){
+		return "<a href=\"/ltrdashboard/@currentLtrid/annotation/"+row.qid+"\">"+value+"</a>"
+  }
+  function CheckedFlgFormatter(value, row){
+      if (value == true)
+        return "done";
+    return "";
+  }
+</script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+<div>
+  <div class="container-fluid">
+    <div class="row">
+      <form id="uploadform" data-toggle="validator" enctype="multipart/form-data" method="post">
+      <div class="col-md-5">
+          <p class="text-success">@success</p>
+          <p class="text-danger">@error</p>
+      </div>
+      <div class="col-md-3">
+          <div class="form-group">
+            <input type="file" id="query" name="query">
+          </div>
+      </div>
+      <div class="col-md-4">
+        <button id="upload-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal" disabled><i class="glyphicon glyphicon-upload"></i> Upload</button>
+        <!-- Modal -->
+        <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>
+                  <strong>Are you sure to upload the query file ?</strong>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="upload" type="button" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button id="clear-button" type="button" class="btn btn-warning" data-toggle="modal" data-target="#clearModal" ><i class="glyphicon glyphicon-erase"></i> Clear All</button>
+        <!-- Modal -->
+        <div class="modal fade" id="clearModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>
+                  <strong>Are you sure to clear all annotations ?</strong>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="clear" type="button" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="clearEachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>
+                  <strong>Are you sure to clear this annotation status ?</strong>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="clearEach" type="button" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="deleteEachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>
+                  <strong>Are you sure to delete this query ?</strong>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="deleteEach" type="button" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+      </form>
+    </div>
+
+
+    <div class="row">
+      <div class="col-sm-9 col-md-10 main">
+        <h1 class="page-header">Query List</h1>
+
+        <div id="toolbar">
+          <p>
+          <button id="delete-each-button" type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#deleteEachModal"><i class="glyphicon glyphicon-trash"></i> Delete</button>
+            <button id="clear-each-button" type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#clearEachModal"><i class="glyphicon glyphicon-erase"></i> Clear</button>
+          </p>
+        </div>
+
+        <table id="table"
+           data-toggle="table"
+           data-pagination="true"
+           data-pagination-first-text="First"
+           data-pagination-pre-text="Prev"
+           data-pagination-next-text="Next"
+           data-pagination-last-text="Last"
+           data-id-field="qid"
+           data-side-pagination="server"
+           data-url="/ltr/query/@currentLtrid/list">
+          <thead>
+            <tr>
+              <th data-field="state" data-checkbox="true"></th>
+              <th  class="col-xs-1" data-formatter="RowNumFormatter">#</th>
+              <th data-field="query" data-sortable="true" data-formatter="QueryFormatter">Query</th>
+              <th class="col-xs-2" data-field="checked_flg" data-sortable="true"  data-formatter="CheckedFlgFormatter">Annotation Status</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+}
+

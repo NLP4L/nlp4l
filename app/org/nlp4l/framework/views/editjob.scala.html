@@ -1,0 +1,127 @@
+@import org.nlp4l.framework.builtin.Job
+@(job: Job, runIdList: Seq[Int], success: String, error: String)
+
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/framework/editjob.js")" type="text/javascript"></script>
+}
+
+@main(headerAddon) {
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li><a href="/dashboard/job/@job.jobId">Job Info <span class="sr-only"/></a></li>
+
+          @for(runId <- runIdList) {
+          <li><a href="/dashboard/job/result/@job.jobId/@runId">#@runId<span class="sr-only"/></a></li>
+          }
+          
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-md-10 main">
+        <h2 class="sub-header">Job Info</h2>
+        <form id="inputform" data-toggle="validator">
+          <div class="table-responsive">
+            <div class="row">
+              <div class="col-md-1">Job Name</div>
+              <div class="col-md-11">
+                    <div id="ukeyfg" class="form-group has-feedback">
+                      <input type="text" class="form-control" id="name" value="@job.name" required>
+                      <input type="hidden" id="configdata" value="@job.config">
+                    </div>
+              </div>
+            </div>
+          </div>
+          <div class="button_wrapper">
+            <div class="row">
+			  <div class="col-md-4">
+                <button id="run-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#runModal"><i class="glyphicon glyphicon-play"></i> Run</button>
+              </div>
+              <div class="col-md-4">
+                <button id="save-button" type="button" class="btn btn-primary" disabled><i class="glyphicon glyphicon-save"></i> Save</button>
+              </div>
+              <div class="col-md-4">
+                <button id="delete-button" type="button" class="btn btn-warning" data-toggle="modal" data-target="#deleteModal"><i class="glyphicon glyphicon-remove"></i> Delete this job</button>
+              </div>
+            </div>
+	          <!-- Modal -->
+	          <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to delete this job?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button id="delete-job" type="button" class="btn btn-primary">OK</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+        <!-- Modal -->
+        <div class="modal fade" id="runModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>
+                  <strong>Are you sure to execute this job?</strong>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button id="execjob" type="button" class="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+          </div>
+        </form>
+        <br/>
+
+        <h2 class="sub-header">Config</h2>
+
+        <form id="uploadform" data-toggle="validator" enctype="multipart/form-data" method="post">
+          <p class="text-success">@success</p>
+          <p class="text-danger">@error</p>
+          <div class="form-group">
+            <input type="file" id="config" name="config">
+          </div>
+          <button id="upload-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal" disabled><i class="glyphicon glyphicon-upload"></i> Upload</button>
+          <!-- Modal -->
+          <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <p>
+                    <strong>Are you sure to replace the config file to new one?</strong>
+                  </p>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button id="upload" type="button" class="btn btn-primary">OK</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <br/>
+        <pre id="configfile">@job.config</pre>
+      </div>
+    </div>
+  </div>
+}

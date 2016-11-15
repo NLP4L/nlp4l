@@ -1,0 +1,154 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/feature.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+	
+  
+  <div class="container-fluid">
+    
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <p>Extraction Status (<span id="pv" style="color:#00b200">0</span>)%</p>
+        <span id="status"></span>
+        
+      </div>
+      
+      <div class="col-sm-9 col-md-10 main">
+        <div class="row">
+  	      <form id="featureform" data-toggle="validator" method="post">
+	      <div class="col-md-6">
+	          <button id="clear-button" type="button" class="btn btn-warning" data-toggle="modal" data-target="#clearModal" ><i class="glyphicon glyphicon-erase"></i> Clear</button>
+	          <!-- Modal -->
+	          <div class="modal fade" id="clearModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to clear the annotationd data?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button id="clear" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	      </div>
+	      
+	      <div class="col-md-6 text-right">
+	          <button id="extract-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#extractModal" ><i class="glyphicon glyphicon-play"></i> Extract</button>
+	          <!-- Modal -->
+	          <div class="modal fade" id="extractModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	            <div class="modal-dialog" role="document">
+	              <div class="modal-content">
+	                <div class="modal-body">
+	                  <p>
+	                    <strong>Are you sure to execute new extraction?</strong>
+	                  </p>
+	                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+	                  <button id="extract" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	      </form>
+	      
+	      <div class="row">
+	        <p>
+           <progress value="0" id="p" max=100 style="margin: 30px; height: 30px; width: 90%;-webkit-appearance: none; -moz-appearance: none; appearance: none;"></progress>
+           </p>
+	       <p style="margin: 30px; width: 90%;" class="text-danger" id="errormsg">@error</p>
+
+<script>
+	var progressBar = document.getElementById('p');
+	var progressValue = document.getElementById('pv');
+	var progressStatus = document.getElementById('status');
+	var errorMsg = document.getElementById('errormsg');
+
+	function updateProgress() {
+		getProgressValue().done(function(result) {
+			var newValue = result;
+			if (newValue >= 100) {
+				progressBar.value = 100;
+				progressValue.innerHTML = 100;
+				progressStatus.innerHTML = "<h4><span class=\"label label-success\">DONE</span></h4>";
+				errorMsg.innerHTML = "";
+				return;
+			}
+			progressBar.value = newValue;
+			progressValue.innerHTML = newValue;
+			if(newValue > 0) {
+				progressStatus.innerHTML = "<h4><span class=\"label label-warning\">RUNNING</span></h4>";
+				errorMsg.innerHTML = "";
+		    } else if(newValue == 0) {
+		    	progressStatus.innerHTML = "<h4><span class=\"label label-default\">NOT YET</span></h4>";
+		    	errorMsg.innerHTML = "";
+		    } else {
+		    	progressBar.value = 0;
+				progressValue.innerHTML = -1;
+		    	progressStatus.innerHTML = "<h4><span class=\"label label-danger\">ERROR</span></h4>";
+		    	getProgressMessage();
+		    }
+			setTimeout(function() {
+				updateProgress();
+			}, 1000);
+		}).fail(function(result) {
+			setTimeout(function() {
+				updateProgress();
+			}, 1000);
+		});
+		
+	}
+
+	function getProgressValue() {
+		return $.ajax({
+			type : 'GET',
+			url : '/ltr/feature/@currentLtrid/progress'
+		});
+	}
+	function getProgressMessage() {
+		var f = $.ajax({
+			type : 'GET',
+			url : '/ltr/feature/@currentLtrid/message'
+		});
+		f.done(function(result) {
+			errorMsg.innerHTML = result;
+		}).fail(function(result) {
+			errorMsg.innerHTML = "Error: Something wrong"
+		});
+	}
+	updateProgress();
+</script>
+         
+         
+	      </div>
+	    </div>
+	 
+
+         
+         
+    </div>
+  </div>
+
+}
+

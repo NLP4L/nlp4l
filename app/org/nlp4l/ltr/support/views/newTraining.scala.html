@@ -1,0 +1,85 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], ltrmodels: Seq[Ltrmodel], features: Seq[Ltrfeature], success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/training.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+	
+  <div class="container-fluid">
+    <form id="modelform" data-toggle="validator" method="post">
+    <div class="row">
+      <div class="col-md-6">
+          <p class="text-success">@success</p>
+          <p class="text-danger">@error</p>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a href="/ltrdashboard/@currentLtrid/training/new">&lt;&lt; New &gt;&gt;  <span class="sr-only"/></a></li>
+
+                @for(aLtrModel <- ltrmodels) {
+                <li><a href="/ltrdashboard/@currentLtrid/training/@aLtrModel.mid">#@aLtrModel.runid <span class="sr-only"/></a></li>
+                }
+
+            </ul>
+        </div>
+
+        <div class="col-sm-9 col-md-10 main">
+
+            <div class="row">
+                <p>Choose features and click Start button to start the training.
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <button id="create-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#createModal"><i class="glyphicon glyphicon-play"></i> Start</button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <p>
+                                        <strong>Are you sure to create new model?</strong>
+                                    </p>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <button id="create" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <h3>Features</h3>
+
+            @for(aFeature <- features) {
+            <div class="checkbox">
+                <label><input type="checkbox" name="checkFeature" value="@aFeature.fid">@aFeature.name</label>
+            </div>
+            }
+        </div>
+    </div>
+    </form>
+
+  </div>
+
+}
+
