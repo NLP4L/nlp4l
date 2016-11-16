@@ -37,29 +37,30 @@ class LuceneSpellcheckIndexingProcessorFactory(settings: Config) extends Process
 
 class LuceneSpellcheckIndexingProcessor(val index: String, val dicType: String, val settings: Config) extends Processor {
 
-  val dictionary: SpellDictionary = dicType match {
-    case "plainText" => {
-      val file = settings.getString("file")
-      new PlainTextDictionary(FileSystems.getDefault.getPath(file))
-    }
-    case "file" => {
-      val file = settings.getString("file")
-      val delimiter = if(settings.hasPath("delimiter")) settings.getString("delimiter")
-                      else FileDictionary.DEFAULT_FIELD_DELIMITER
-      val is = new FileInputStream(file)
-      new FileDictionary(is, delimiter)
-    }
-    case "lucene" => {
-      val idxDir = FSDirectory.open(FileSystems.getDefault.getPath(settings.getString("index")))
-      val field = settings.getString("field")
-      val reader = DirectoryReader.open(idxDir)
-      new LuceneDictionary(reader, field)
-    }
-    case a => throw new IllegalArgumentException(s"unknown dictionary type was specified: $a")
-  }
-  val spellChecker: SpellChecker = new SpellChecker(FSDirectory.open(FileSystems.getDefault.getPath(index)))
-
   override def execute(data: Option[Dictionary]): Option[Dictionary] = {
+
+    val dictionary: SpellDictionary = dicType match {
+      case "plainText" => {
+        val file = settings.getString("file")
+        new PlainTextDictionary(FileSystems.getDefault.getPath(file))
+      }
+      case "file" => {
+        val file = settings.getString("file")
+        val delimiter = if(settings.hasPath("delimiter")) settings.getString("delimiter")
+        else FileDictionary.DEFAULT_FIELD_DELIMITER
+        val is = new FileInputStream(file)
+        new FileDictionary(is, delimiter)
+      }
+      case "lucene" => {
+        val idxDir = FSDirectory.open(FileSystems.getDefault.getPath(settings.getString("index")))
+        val field = settings.getString("field")
+        val reader = DirectoryReader.open(idxDir)
+        new LuceneDictionary(reader, field)
+      }
+      case a => throw new IllegalArgumentException(s"unknown dictionary type was specified: $a")
+    }
+    val spellChecker: SpellChecker = new SpellChecker(FSDirectory.open(FileSystems.getDefault.getPath(index)))
+
     spellChecker.indexDictionary(dictionary, new IndexWriterConfig(new StandardAnalyzer()), true)
     spellChecker.close
 
