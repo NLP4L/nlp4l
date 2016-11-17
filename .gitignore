@@ -7,7 +7,7 @@
 .cache-main
 .scala_dependencies
 corpora
-/target
+target
 labeled-point-out
 loanwords*.txt*
 /docs/*.html
