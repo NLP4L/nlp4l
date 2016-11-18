@@ -59,20 +59,27 @@ class CSVFileWriterFactory(settings: Config) extends WriterFactory(settings) {
     new CSVFileWriter(
       getStrParam("file", null),
       getStrParam("separator", ","),
-      getStrParam("encoding", "UTF-8")
+      getStrParam("encoding", "UTF-8"),
+      getBoolParam("header", true),
+      getBoolParam("surroundQuote", true),
+      getBoolParam("outputSystemColumns", false)
     )
   }
 }
 
-class CSVFileWriter(file: String, separator: String, encoding: String) extends Writer {
+class CSVFileWriter(file: String, separator: String, encoding: String, header: Boolean, surroundQuote: Boolean, outputSystemColumns: Boolean) extends Writer {
 
   override def write(data: Option[Dictionary], dictionaryAttribute: DictionaryAttribute): String = {
     data match {
       case Some(dic) => {
         val outfile = if (file == null) File.createTempFile("nlp4l-", ".csv") else new File(file)
-        val result = dic.recordList.map(r => r.mkCsvRecord(separator))
+        val result = if(outputSystemColumns)
+          dic.recordList.map(r => r.mkCsvRecord(separator, null, surroundQuote))
+        else
+          dic.recordList.map(r => r.mkCsvRecord(separator, "id,replay", surroundQuote))
 
         for (output <- managed(new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outfile), encoding))))) {
+          if(header) output.println(dictionaryAttribute.cellAttributeList.map(_.name).mkString(separator))
           result.foreach(output.println(_))
         }
         outfile.getAbsolutePath

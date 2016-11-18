@@ -618,7 +618,7 @@ class DataModelsSpec extends Specification {
     "Record.mkCsvRecord" should {
       "make a CSV record as appropriate" in {
         val r = Record(Seq(Cell("na1", "va11"), Cell("na2", "va12"), Cell("na3", 100)))
-        r.mkCsvRecord(",") must_== "va11,va12,100"
+        r.mkCsvRecord(",") must_== s""""va11","va12","100""""
       }
     }
   }

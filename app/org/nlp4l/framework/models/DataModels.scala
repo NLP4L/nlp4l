@@ -134,8 +134,10 @@ case class Record (
     }
   }
 
-  def mkCsvRecord(sep: String): String = {
-    cellList.map(c => c.value.toString).mkString(sep)
+  def mkCsvRecord(sep: String, notFilters: String = null, surroundQuote: Boolean = true): String = {
+    val nfs = if(notFilters == null) Set.empty[String] else notFilters.split(",").toSet
+    cellList.filterNot(c => nfs.contains(c.name)).map(c =>
+      if(surroundQuote) s""""${c.value.toString}"""" else c.value.toString).mkString(sep)
   }
 }
 
