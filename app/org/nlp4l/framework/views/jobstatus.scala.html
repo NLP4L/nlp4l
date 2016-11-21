@@ -31,9 +31,28 @@
 		return "<a href=\"/dashboard/job/"+value+"\">"+value+"</a>"
   }
   function RunIdFormatter(value, row){
-	  	runId = value.split('/')[1]
-		return "<a href=\"/dashboard/job/result/"+value+"\">"+runId+"</a>"
+      runId = value.split('/')[1]
+	  return "<a href=\"/dashboard/job/result/"+value+"\">"+runId+"</a>"
   }
+  function ProgressFormatter(value, row){
+ 	  jobId = value.split('/')[0]
+	  runId = value.split('/')[1]
+	  progressV = value.split('/')[2]
+ 	  if(progressV < 100) {
+ 		  return "("+progressV+"%)<progress value=\"" + progressV + "\" id=\"p" + jobId + "_" + runId + "\" max=100 style=\"margin-top: 20px; margin-left: 10px; height: 20px; width: 90%; -webkit-appearance: none; -moz-appearance: none; appearance: none;\"></progress>"
+ 	  } else {
+ 		  return "(100%)"
+ 	  }
+  }
+  
+	function updateProgress() {
+		$('#table').bootstrapTable('refresh', '{silent: true}');
+		setTimeout(function() {
+			updateProgress();
+		}, 5000);
+	}
+	updateProgress();
+  
 </script>
 }
 
@@ -41,7 +60,7 @@
 
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-9 col-md-10 main">
+      <div class="col-sm-12 col-md-12 main">
         <h1 class="page-header">Job Status</h1>
         
         <table id="table"
@@ -56,12 +75,11 @@
            data-url="/job/status">
           <thead>
             <tr>
-              <th data-field="status" data-formatter="StatusFormatter">Status</th>
-              <th data-field="jobId" data-formatter="JobIdFormatter">JobID</th>
-              <th data-field="runId" data-formatter="RunIdFormatter">RunID</th>
-              <th data-field="total">Total</th>
-              <th data-field="done">Done</th>
-              <th data-field="message">Message</th>
+              <th data-field="status" class="col-md-1" data-formatter="StatusFormatter">Status</th>
+              <th data-field="jobId" class="col-md-1" data-formatter="JobIdFormatter">JobID</th>
+              <th data-field="runId" class="col-md-1" data-formatter="RunIdFormatter">RunID</th>
+              <th data-field="progress" class="col-md-6" data-formatter="ProgressFormatter">Progress</th>
+              <th data-field="message" class="col-md-3">Message</th>
             </tr>
           </thead>
         </table>
