@@ -1,10 +1,14 @@
 NLP4L/framework change history
 
-========== 0.5-dev / YYYY-MM-DD ===================================
+========== 0.5.0 / 2016-11-23 ===================================
 
 Important Notice
 
+* Project renamed from framework to nlp4l
+
 New Features & Improvements
+
+* Integration with ltr_support
 
 Bug Fixes
 

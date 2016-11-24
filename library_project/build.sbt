@@ -8,7 +8,7 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "NLP4L-framework-library",
-    version := "0.4.0",
+    version := "0.5.0",
     scalacOptions := Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     parallelExecution := true,
     libraryDependencies ++= Seq(
@@ -20,5 +20,7 @@ lazy val root = (project in file(".")).
 
 scalaSource in Compile := baseDirectory.value / "../app"
 
-includeFilter in (Compile, unmanagedSources) := "DataModels.scala" || "Processor.scala"
+includeFilter in (Compile, unmanagedSources) := "DataModels.scala" || "Processor.scala" || "Trainers.scala"
+
+
 

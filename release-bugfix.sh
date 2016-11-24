@@ -59,7 +59,7 @@ git push origin "rel-${THIS_REL_NUM}"
 git checkout "rel-${THIS_BRANCH_NUM}"
 sed -e "1d" CHANGES.txt > CHANGES.txt.temp
 cat<<EOF> CHANGES.txt
-NLP4L/framework change history
+NLP4L/nlp4l change history
 
 ========== ${NEXT_REL_NUM} / YYYY-MM-DD ===================================
 
@@ -92,8 +92,8 @@ git push
 
 echo -e "\\n\\n\\nThe rel-${THIS_REL_NUM} has been almost prepared. Please execute the following to finalize.\\n"
 echo "1. git checkout rel-${THIS_REL_NUM}"
-echo "2. build nlp4l-framework-${THIS_REL_NUM}.zip file by executing activator dist."
-echo "3. Go to https://github.com/NLP4L/framework/releases/tag/rel-${THIS_REL_NUM}"
+echo "2. build nlp4l-${THIS_REL_NUM}.zip file by executing activator dist."
+echo "3. Go to https://github.com/NLP4L/nlp4l/releases/tag/rel-${THIS_REL_NUM}"
 echo "4. click [Edit tag] button and drop down the zip file to the drop down box and click [Publish release]"
 echo "5. git checkout master"
-echo -e "\\nThe download link will be  https://github.com/NLP4L/framework/releases/download/rel-${THIS_REL_NUM}/nlp4l-framework-${THIS_REL_NUM}.zip"
+echo -e "\\nThe download link will be  https://github.com/NLP4L/nlp4l/releases/download/rel-${THIS_REL_NUM}/nlp4l-${THIS_REL_NUM}.zip"
