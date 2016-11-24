@@ -1,4 +1,25 @@
-NLP4L/framework change history
+NLP4L/nlp4l change history
+
+========== 0.6-dev / YYYY-MM-DD ===================================
+
+Important Notice
+
+New Features & Improvements
+
+Bug Fixes
+
+API Changes
+
+Javadoc Fixes
+
+Project environments
+
+Tests
+
+Deprecated/Deleted Features
+
+Others
+
 
 ========== 0.5.0 / 2016-11-23 ===================================
 
