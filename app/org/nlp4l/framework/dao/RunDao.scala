@@ -132,6 +132,11 @@ class RunDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider) e
   }
   
   
+  def fetchRunStatus(jobId: Int, runId: Int): Future[Seq[JobStatus]] = {
+    db.run(jobStatus.filter(_.jobId === jobId).filter(_.runId === runId).take(1).result)
+  }
+  
+  
   // Run Result Table
   
   def createTable(jobId: Int, runId: Int, dicAttr: DictionaryAttribute): Future[Int] = {

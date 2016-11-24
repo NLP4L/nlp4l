@@ -446,6 +446,19 @@ class JobController @Inject()(jobDAO: JobDAO, runDAO: RunDAO, @Named("processor-
         Ok(jsonResponse)
     }
   }
+  
+  
+  def runStatus(jobId: Int, runId: Int) = Action.async {request =>
+    
+    runDAO.fetchRunStatus(jobId, runId).map {
+      res =>
+        val jsonResponse = Json.obj(
+          "total" -> 1,
+          "rows" -> Json.toJson(res)
+        )
+        Ok(jsonResponse)
+    }
+  }
 
 
   def jobResult(jobId: Int, runId: Int) = Action { request =>
