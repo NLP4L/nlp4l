@@ -34,6 +34,19 @@ $ ->
     $('#uploadform').attr('method', 'POST')
     $('#uploadform').submit()
 
+  $('#importFile').change ->
+    files = $('#importFile')[0].files
+    if (files.length == 1)
+      $('#import').prop('disabled', false)
+    else
+      $('#import').prop('disabled', true)
+
+  $('#import').click ->
+    action = '/ltr/query/' + ltrid + '/import'
+    $('#importform').attr('action', action)
+    $('#importform').attr('method', 'POST')
+    $('#importform').submit()
+
   $('#clear').click ->
     action = '/ltr/query/' + ltrid + '/clear'
     $('#uploadform').attr('action', action)

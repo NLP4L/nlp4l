@@ -40,7 +40,7 @@
   <div class="container-fluid">
     <div class="row">
       <form id="uploadform" data-toggle="validator" enctype="multipart/form-data" method="post">
-      <div class="col-md-5">
+      <div class="col-md-4">
           <p class="text-success">@success</p>
           <p class="text-danger">@error</p>
       </div>
@@ -49,7 +49,7 @@
             <input type="file" id="query" name="query">
           </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-5">
         <button id="upload-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal" disabled><i class="glyphicon glyphicon-upload"></i> Upload</button>
         <!-- Modal -->
         <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -82,6 +82,32 @@
           </div>
         </div>
 
+        <button id="import-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#importModal"><i class="glyphicon glyphicon-import"></i> Import</button>
+
+      </div>
+      </form>
+
+      <!-- Modal -->
+      <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-body">
+              <p>
+              <form id="importform" data-toggle="validator" enctype="multipart/form-data" method="post">
+              <p>
+                <strong>Specify query annotation data file. </strong>
+              </p>
+              <div class="form-group">
+                <input type="file" id="importFile" name="importFile">
+              </div>
+              </form>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button id="import" type="button" class="btn btn-primary" disabled>Import</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
         <!-- Modal -->
         <div class="modal fade" id="clearEachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
           <div class="modal-dialog" role="document">
@@ -112,8 +138,6 @@
           </div>
         </div>
 
-        </div>
-      </form>
     </div>
 
 

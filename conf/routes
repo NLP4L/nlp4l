@@ -84,6 +84,7 @@ POST          /ltr/config                                              @org.nlp4
 POST          /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.saveLtrConfig(ltrid: Int)
 DELETE        /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.deleteLtrConfig(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>                                @org.nlp4l.ltr.support.controllers.LtrController.saveQuery(ltrid: Int)
+POST          /ltr/query/$ltrid<[0-9]+>/import                         @org.nlp4l.ltr.support.controllers.LtrController.importQueryAnnotation(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>/clear                          @org.nlp4l.ltr.support.controllers.LtrController.clearAllAnnotation(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>/clear/$qid<[0-9]+>             @org.nlp4l.ltr.support.controllers.LtrController.clearAnnotation(ltrid: Int, qid: Int)
 GET           /ltr/query/$ltrid<[0-9]+>/list                           @org.nlp4l.ltr.support.controllers.LtrController.listQuery(ltrid: Int)

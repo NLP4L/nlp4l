@@ -164,6 +164,27 @@ class LtrController @Inject()(docFeatureDAO: DocFeatureDAO,
     Redirect("/ltrdashboard/" + ltrid + "/query")
   }
 
+  def importQueryAnnotation(ltrid: Int) = Action(parse.multipartFormData) { request =>
+    request.body.file("importFile") map { file =>
+      val uuid = UUID.randomUUID().toString
+      val temp = new File(s"/tmp/$uuid")
+      file.ref.moveTo(temp, replace = true)
+      val tempPath = Paths.get(temp.getAbsolutePath)
+      val lines = Files.readAllLines(tempPath).toList.filter(!_.trim().isEmpty)
+      val qgroup: Map[String, List[Array[String]]] = lines.map(_.split(",")).groupBy(_ (0))
+      qgroup.foreach(qg => {
+        val ltrquery = Ltrquery(None, qg._2.head(1), ltrid, true)
+        val f = ltrqueryDAO.insert(ltrquery)
+        val query = Await.result(f, scala.concurrent.duration.Duration.Inf)
+        val list = qg._2.map(line => {
+          Ltrannotation(query.qid.get, line(2), line(3).toInt, ltrid)
+        })
+        ltrannotationDAO.insertList(list)
+      })
+    }
+    Redirect("/ltrdashboard/" + ltrid + "/query")
+  }
+
   def clearAllAnnotation(ltrid: Int) = Action { request =>
     val clearf = ltrqueryDAO.clearCheckedFlg(ltrid)
     Await.ready(clearf, scala.concurrent.duration.Duration.Inf)
@@ -201,7 +222,7 @@ class LtrController @Inject()(docFeatureDAO: DocFeatureDAO,
     }
     val totalf = ltrqueryDAO.totalCountByLtrid(ltrid)
     val total = Await.result(totalf, scala.concurrent.duration.Duration.Inf)
-    val qlistf = ltrqueryDAO.fetchByLtrid(ltrid, "qid", "asc", 0, total)
+    val qlistf = ltrqueryDAO.fetchByLtrid(ltrid, "qid", "asc", offset, size)
     val qlist = Await.result(qlistf, scala.concurrent.duration.Duration.Inf)
     val jsonResponse = Json.obj(
       "total" -> total,
