@@ -61,6 +61,7 @@ class LuceneSpellcheckIndexingProcessor(val index: String, val dicType: String, 
     }
     val spellChecker: SpellChecker = new SpellChecker(FSDirectory.open(FileSystems.getDefault.getPath(index)))
 
+    spellChecker.clearIndex();
     spellChecker.indexDictionary(dictionary, new IndexWriterConfig(new StandardAnalyzer()), true)
     spellChecker.close
 
