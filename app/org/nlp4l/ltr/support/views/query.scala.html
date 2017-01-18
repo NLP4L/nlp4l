@@ -20,7 +20,7 @@
 }
 
 <!--
- Copyright 2015 org.NLP4L
+ Copyright 2017 org.NLP4L
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -82,31 +82,10 @@
           </div>
         </div>
 
-        <button id="import-button" type="button" class="btn btn-primary" data-toggle="modal" data-target="#importModal"><i class="glyphicon glyphicon-import"></i> Import</button>
+        <button id="import" type="button" class="btn btn-primary"><i class="glyphicon glyphicon-import"></i> Import</button>
 
       </div>
       </form>
-
-      <!-- Modal -->
-      <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <p>
-              <form id="importform" data-toggle="validator" enctype="multipart/form-data" method="post">
-              <p>
-                <strong>Specify query annotation data file. </strong>
-              </p>
-              <div class="form-group">
-                <input type="file" id="importFile" name="importFile">
-              </div>
-              </form>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-              <button id="import" type="button" class="btn btn-primary" disabled>Import</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
         <!-- Modal -->
         <div class="modal fade" id="clearEachModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

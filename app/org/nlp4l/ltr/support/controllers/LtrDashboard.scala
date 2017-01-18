@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 org.NLP4L
+ * Copyright 2017 org.NLP4L
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,6 +162,13 @@ class LtrDashboard @Inject()(docFeatureDAO: DocFeatureDAO,
     val json: JsValue = Json.parse(ltrmodel.feature_list)
     val featureList = (json \ "features").as[Seq[JsValue]].map(_.as[String])
     Ok(org.nlp4l.ltr.support.views.html.trainingStatus(ltrid,menubars,ltr,ltrmodels,featureList,ltrmodel,"",""))
+  }
+
+  def dataImport(ltrid: Int) = Action {
+    val ltr = getLtr(ltrid)
+    val menubars = buildMenubars(ltrid)
+
+    Ok(org.nlp4l.ltr.support.views.html.dataImport(ltrid,menubars,ltr,"",""))
   }
 
   private def buildMenubars(ltrid: Int): Seq[Menubar] = {

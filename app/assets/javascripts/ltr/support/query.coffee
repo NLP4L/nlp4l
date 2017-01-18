@@ -1,5 +1,5 @@
 ###
- Copyright 2015 org.NLP4L
+ Copyright 2015-2017 org.NLP4L
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,18 +34,9 @@ $ ->
     $('#uploadform').attr('method', 'POST')
     $('#uploadform').submit()
 
-  $('#importFile').change ->
-    files = $('#importFile')[0].files
-    if (files.length == 1)
-      $('#import').prop('disabled', false)
-    else
-      $('#import').prop('disabled', true)
-
   $('#import').click ->
-    action = '/ltr/query/' + ltrid + '/import'
-    $('#importform').attr('action', action)
-    $('#importform').attr('method', 'POST')
-    $('#importform').submit()
+    jump = '/ltrdashboard/' + ltrid + '/dataImport'
+    location.replace(jump)
 
   $('#clear').click ->
     action = '/ltr/query/' + ltrid + '/clear'
