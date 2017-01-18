@@ -76,6 +76,7 @@ GET           /ltrdashboard/$ltrid<[0-9]+>/feature                     @org.nlp4
 GET           /ltrdashboard/$ltrid<[0-9]+>/training                    @org.nlp4l.ltr.support.controllers.LtrDashboard.training(ltrid: Int)
 GET           /ltrdashboard/$ltrid<[0-9]+>/training/new                @org.nlp4l.ltr.support.controllers.LtrDashboard.newTraining(ltrid: Int)
 GET           /ltrdashboard/$ltrid<[0-9]+>/training/$mid<[0-9]+>       @org.nlp4l.ltr.support.controllers.LtrDashboard.trainingStatus(ltrid: Int, mid: Int)
+GET           /ltrdashboard/$ltrid<[0-9]+>/dataImport                  @org.nlp4l.ltr.support.controllers.LtrDashboard.dataImport(ltrid: Int)
 
 
 
@@ -84,7 +85,6 @@ POST          /ltr/config                                              @org.nlp4
 POST          /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.saveLtrConfig(ltrid: Int)
 DELETE        /ltr/config/$ltrid<[0-9]+>                               @org.nlp4l.ltr.support.controllers.LtrController.deleteLtrConfig(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>                                @org.nlp4l.ltr.support.controllers.LtrController.saveQuery(ltrid: Int)
-POST          /ltr/query/$ltrid<[0-9]+>/import                         @org.nlp4l.ltr.support.controllers.LtrController.importQueryAnnotation(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>/clear                          @org.nlp4l.ltr.support.controllers.LtrController.clearAllAnnotation(ltrid: Int)
 POST          /ltr/query/$ltrid<[0-9]+>/clear/$qid<[0-9]+>             @org.nlp4l.ltr.support.controllers.LtrController.clearAnnotation(ltrid: Int, qid: Int)
 GET           /ltr/query/$ltrid<[0-9]+>/list                           @org.nlp4l.ltr.support.controllers.LtrController.listQuery(ltrid: Int)
@@ -102,4 +102,5 @@ GET           /ltr/training/$ltrid<[0-9]+>                             @org.nlp4
 GET           /ltr/training/$ltrid<[0-9]+>/progress/$runid<[0-9]+>     @org.nlp4l.ltr.support.controllers.LtrController.getTrainingProgress(ltrid: Int, runid: Int)
 DELETE        /ltr/training/$ltrid<[0-9]+>/delete/$mid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.deleteTraining(ltrid: Int, mid: Int)
 GET           /ltr/training/$ltrid<[0-9]+>/deploy/$mid<[0-9]+>         @org.nlp4l.ltr.support.controllers.LtrController.deployModel(ltrid: Int, mid: Int)
+POST          /ltr/dataImport/$ltrid<[0-9]+>/importData                @org.nlp4l.ltr.support.controllers.LtrController.importData(ltrid: Int)
 

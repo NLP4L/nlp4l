@@ -17,17 +17,14 @@
 package org.nlp4l.ltr.support.controllers
 
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.{Files, Paths}
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import scala.collection.JavaConversions.asScalaBuffer
-import scala.collection.convert.WrapAsScala._
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 import scala.util.Failure
 import scala.util.Success
 import org.nlp4l.ltr.support.actors._
@@ -40,6 +37,7 @@ import org.nlp4l.ltr.support.dao.LtrqueryDAO
 import org.nlp4l.ltr.support.models._
 import org.nlp4l.ltr.support.models.ViewModels._
 import org.nlp4l.ltr.support.models.DbModels._
+import org.nlp4l.ltr.support.models.ClickModels._
 import com.google.inject.name.Named
 import akka.actor.ActorRef
 import akka.pattern.AskableActorRef
@@ -48,15 +46,16 @@ import javax.inject.Inject
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.joda.time.DateTime
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.json.JsValue.jsValueToJsLookup
-import play.api.libs.json.Json
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import org.nlp4l.ltr.support.dao.FeatureProgressDAO
-import org.nlp4l.ltr.support.procs.DeployerFactory
+import org.nlp4l.ltr.support.procs.{ClickModelAnalyzer, DeployerFactory}
 import play.api.Logger
+
+import scala.io.Source
 
 class LtrController @Inject()(docFeatureDAO: DocFeatureDAO, 
                              ltrfeatureDAO: LtrfeatureDAO, 
@@ -164,25 +163,63 @@ class LtrController @Inject()(docFeatureDAO: DocFeatureDAO,
     Redirect("/ltrdashboard/" + ltrid + "/query")
   }
 
-  def importQueryAnnotation(ltrid: Int) = Action(parse.multipartFormData) { request =>
-    request.body.file("importFile") map { file =>
+  def importData(ltrid: Int) = Action(parse.multipartFormData) { request =>
+    val result = request.body.file("importFile") map { file =>
       val uuid = UUID.randomUUID().toString
       val temp = new File(s"/tmp/$uuid")
       file.ref.moveTo(temp, replace = true)
-      val tempPath = Paths.get(temp.getAbsolutePath)
-      val lines = Files.readAllLines(tempPath).toList.filter(!_.trim().isEmpty)
-      val qgroup: Map[String, List[Array[String]]] = lines.map(_.split(",")).groupBy(_ (0))
-      qgroup.foreach(qg => {
-        val ltrquery = Ltrquery(None, qg._2.head(1), ltrid, true)
-        val f = ltrqueryDAO.insert(ltrquery)
-        val query = Await.result(f, scala.concurrent.duration.Duration.Inf)
-        val list = qg._2.map(line => {
-          Ltrannotation(query.qid.get, line(2), line(3).toInt, ltrid)
+      val importType = request.body.dataParts.getOrElse("importType", Seq("QAD")).head
+      val importSettings = request.body.dataParts.getOrElse("importSettings", Seq("")).head
+      if (importType.equals("ICM") || importType.equals("DCM")) {
+        val source: String = Source.fromFile(temp.getAbsolutePath).getLines.mkString
+        val json: JsValue = Json.parse(source)
+        val data =  (json \ "data").as[Seq[ImpressionLog]]
+        val dcm = true
+        val config = ConfigFactory.parseString(importSettings)
+        val clickModel = new ClickModelAnalyzer()
+        val dataTopN = if (config.hasPath("topQueries")) clickModel.filterTopQueries(data, config.getInt("topQueries")) else data
+        val dataFiltered = if (importType.equals("DCM")) clickModel.filterAsDCM(dataTopN) else dataTopN
+        val clickRates = clickModel.calcClickRate(dataFiltered)
+        val relevanceDegreeMapping = config.getDoubleList("relevanceDegreeMapping").map(_.toFloat).toArray
+        val clickRateLabels: Map[String, Map[String, Int]] = clickModel.convertClickRateToLabel(clickRates, relevanceDegreeMapping)
+        clickRateLabels.foreach(qg => {
+          val ltrquery = Ltrquery(None, qg._1, ltrid, true)
+          val f = ltrqueryDAO.insert(ltrquery)
+          val query = Await.result(f, scala.concurrent.duration.Duration.Inf)
+          val list = qg._2.map(annotation => {
+            Ltrannotation(query.qid.get, annotation._1, annotation._2, ltrid)
+          }).toList
+          ltrannotationDAO.insertList(list)
         })
-        ltrannotationDAO.insertList(list)
-      })
+        clickRateLabels.size + " queries as " + importType + " imported."
+      } else {
+        val tempPath = Paths.get(temp.getAbsolutePath)
+        val lines = Files.readAllLines(tempPath).toList.filter(!_.trim().isEmpty)
+        val qgroup: Map[String, Seq[Array[String]]] = lines.map(_.split(",")).groupBy(_ (0))
+        qgroup.foreach(qg => {
+          // csv format: easy validation here.
+          val ltrquery = Ltrquery(None, qg._2.head(1), ltrid, true)
+          val list = qg._2.map(line => {
+            Ltrannotation(0, line(2), line(3).toInt, ltrid)
+          })
+        })
+        qgroup.foreach(qg => {
+          val ltrquery = Ltrquery(None, qg._2.head(1), ltrid, true)
+          val f = ltrqueryDAO.insert(ltrquery)
+          val query = Await.result(f, scala.concurrent.duration.Duration.Inf)
+          val list = qg._2.map(line => {
+            Ltrannotation(query.qid.get, line(2), line(3).toInt, ltrid)
+          })
+          ltrannotationDAO.insertList(list)
+        })
+        qgroup.size + " queries with annotations imported."
+     }
     }
-    Redirect("/ltrdashboard/" + ltrid + "/query")
+    val jsonResponse = Json.obj(
+      "status" -> true,
+      "msg" -> ("Import Success: " + result.get)
+    )
+    Ok(jsonResponse)
   }
 
   def clearAllAnnotation(ltrid: Int) = Action { request =>

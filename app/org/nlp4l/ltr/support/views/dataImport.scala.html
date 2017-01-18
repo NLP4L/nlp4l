@@ -1,0 +1,77 @@
+@import org.nlp4l.ltr.support.models._
+@(currentLtrid: Int, menubars: Seq[Menubar], ltr: Option[Ltrconfig], success: String, error: String)
+@headerAddon = {
+<script src="@routes.Assets.versioned("javascripts/ltr/support/dataimport.js")" type="text/javascript"></script>
+}
+
+<!--
+ Copyright 2015 org.NLP4L
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+@main(headerAddon)(menubars) {
+<div>
+  <div class="container-fluid">
+
+    <div class="row">
+      <div class="col-sm-9 col-md-10 main">
+        <h1 class="page-header">Data Import</h1>
+
+        <form id="importform" data-toggle="validator" enctype="multipart/form-data" method="post">
+
+        <p>
+          <strong>Choose import type. </strong>
+        </p>
+   		<div class="form-group">
+            <div class="radio">
+                <label><input type="radio" name="importType" value="QAD" checked>Query Annotation Data</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" name="importType" value="ICM">Impression Log as Independent Click Model (ICM)</label>
+            </div>
+            <div class="radio">
+                <label><input type="radio" name="importType" value="DCM">Impression Log as Dependent Click Model (DCM)</label>
+            </div>
+        </div>
+
+        <p>
+          <strong>Specify import settings. </strong>
+        </p>
+   		<div class="form-group">
+            <textarea class="form-control" name="importSettings" rows="4" />{
+  "relevanceDegreeMapping": [ 0.01, 0.3, 0.6 ],
+  "topQueries": 100
+}</textarea>
+   		</div>
+
+        <p>
+          <strong>Specify import data file. </strong>
+        </p>
+        <div class="form-group">
+          <input type="file" id="importFile" name="importFile">
+        </div>
+        </form>
+
+        <button id="import" type="button" class="btn btn-primary" disabled>Import</button>
+
+         <p>
+         <div id="import_result_msg"></div>
+         </p>
+
+      </div>
+    </div>
+  </div>
+</div>
+}
+

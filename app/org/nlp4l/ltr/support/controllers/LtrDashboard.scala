@@ -164,6 +164,13 @@ class LtrDashboard @Inject()(docFeatureDAO: DocFeatureDAO,
     Ok(org.nlp4l.ltr.support.views.html.trainingStatus(ltrid,menubars,ltr,ltrmodels,featureList,ltrmodel,"",""))
   }
 
+  def dataImport(ltrid: Int) = Action {
+    val ltr = getLtr(ltrid)
+    val menubars = buildMenubars(ltrid)
+
+    Ok(org.nlp4l.ltr.support.views.html.dataImport(ltrid,menubars,ltr,"",""))
+  }
+
   private def buildMenubars(ltrid: Int): Seq[Menubar] = {
     if(ltrid <= 0) {
       Seq(Menubar("Config","/ltrdashboard/0/config"))
