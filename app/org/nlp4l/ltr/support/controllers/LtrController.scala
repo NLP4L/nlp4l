@@ -171,7 +171,7 @@ class LtrController @Inject()(docFeatureDAO: DocFeatureDAO,
       val importType = request.body.dataParts.getOrElse("importType", Seq("QAD")).head
       val importSettings = request.body.dataParts.getOrElse("importSettings", Seq("")).head
       if (importType.equals("ICM") || importType.equals("DCM")) {
-        val source: String = Source.fromFile(temp.getAbsolutePath).getLines.mkString
+        val source: String = Source.fromFile(temp.getAbsolutePath, "UTF-8").getLines.mkString
         val json: JsValue = Json.parse(source)
         val data =  (json \ "data").as[Seq[ImpressionLog]]
         val dcm = true
