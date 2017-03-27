@@ -88,6 +88,10 @@ sed -e s/$THIS_REL_NUM/$NEXT_REL_NUM/ version.properties > version.properties.te
 mv version.properties.temp version.properties
 sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_REL_NUM\"/ build.sbt > build.sbt.temp
 mv build.sbt.temp build.sbt
+cd library_project
+sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_REL_NUM\"/ build.sbt > build.sbt.temp
+mv build.sbt.temp build.sbt
+cd ..
 
 git add .
 git commit -m "prepare the next release ${NEXT_REL_NUM}"

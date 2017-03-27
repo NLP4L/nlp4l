@@ -64,6 +64,11 @@ mv CHANGES.txt.temp CHANGES.txt
 sed -e s/"version := "\"$THIS_DEV_NUM\"/"version := "\"$THIS_REL_NUM\"/ build.sbt > build.sbt.temp
 mv build.sbt.temp build.sbt
 
+cd library_project
+sed -e s/"version := "\"$THIS_DEV_NUM\"/"version := "\"$THIS_REL_NUM\"/ build.sbt > build.sbt.temp
+mv build.sbt.temp build.sbt
+cd ..
+
 # commit the modification
 git add .
 git commit -m "prepare rel-${THIS_REL_NUM}"
@@ -109,6 +114,10 @@ sed -e s/$THIS_REL_NUM/$NEXT_DEV_NUM/ version.properties > version.properties.te
 mv version.properties.temp version.properties
 sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_DEV_NUM\"/ build.sbt > build.sbt.temp
 mv build.sbt.temp build.sbt
+cd library_project
+sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_DEV_NUM\"/ build.sbt > build.sbt.temp
+mv build.sbt.temp build.sbt
+cd ..
 
 git add .
 git commit -m "prepare the next release ${NEXT_BRANCH_NUM}"
@@ -147,6 +156,10 @@ sed -e s/$THIS_REL_NUM/$NEXT_BUGFIX_NUM/ version.properties > version.properties
 mv version.properties.temp version.properties
 sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_BUGFIX_NUM\"/ build.sbt > build.sbt.temp
 mv build.sbt.temp build.sbt
+cd library_project
+sed -e s/"version := "\"$THIS_REL_NUM\"/"version := "\"$NEXT_BUGFIX_NUM\"/ build.sbt > build.sbt.temp
+mv build.sbt.temp build.sbt
+cd ..
 
 git add .
 git commit -m "prepare the next release ${NEXT_BUGFIX_NUM}"
