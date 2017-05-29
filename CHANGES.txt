@@ -1,10 +1,34 @@
 NLP4L/nlp4l change history
 
-========== 0.6-dev / YYYY-MM-DD ===================================
+========== 0.7-dev / YYYY-MM-DD ===================================
 
 Important Notice
 
 New Features & Improvements
+
+Bug Fixes
+
+API Changes
+
+Javadoc Fixes
+
+Project environments
+
+Tests
+
+Deprecated/Deleted Features
+
+Others
+
+
+========== 0.6.0 / 2017-01-29 ===================================
+
+Important Notice
+
+New Features & Improvements
+
+* Import impression log with click model(ICM/DCM) support
+* Import query annotation data
 
 Bug Fixes
 
