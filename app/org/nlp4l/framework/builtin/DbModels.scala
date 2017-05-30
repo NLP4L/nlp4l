@@ -119,7 +119,7 @@ object DbModels {
       var status: String = if(js.total == js.done) { "Done" } else {"Running" }
       if(js.message != null && !js.message.isEmpty()) status = "Error"
       val jobRun = js.jobId + "/" + js.runId
-      val progressV = js.jobId + "/" + js.runId + "/" + (js.done * 100 / js.total).round
+      val progressV = js.jobId + "/" + js.runId + "/" + (js.done * 100 / (if (js.total == 0) 1 else js.total))
       Json.obj(
         "status" -> status,
         "jobId" -> js.jobId,
