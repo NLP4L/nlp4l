@@ -322,10 +322,10 @@ $('#save-button').on('click', function(event) {
         dataType: "json",
         success: function(json_data) {
                 if (saveQid == 0) {
-                  $("#search_result_msg").html("<div class=\"alert alert-danger\">Saved as New Query successfully.</div>");
+                  $("#search_result_msg").html("<div class=\"alert alert-success\">Saved as New Query successfully.</div>");
                   currentQid = json_data.qid
                 } else
-                  $("#search_result_msg").html("<div class=\"alert alert-danger\">Saved successfully.</div>");
+                  $("#search_result_msg").html("<div class=\"alert alert-success\">Saved successfully.</div>");
                 $("#saved_count").html(json_data.saved);
                 $("#total_count").html(json_data.total);
         },
