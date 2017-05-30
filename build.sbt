@@ -16,11 +16,12 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "1.1.0",
   "mysql" % "mysql-connector-java" % "5.1.38",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc41",
-  "org.apache.lucene" % "lucene-analyzers-common" % "5.4.1",
-  "org.apache.lucene" % "lucene-analyzers-kuromoji" % "5.4.1",
-  "org.apache.lucene" % "lucene-suggest" % "5.4.1",
-  "org.apache.lucene" % "lucene-backward-codecs" % "5.4.1",
-  "org.apache.solr" % "solr-solrj" % "5.4.1",
+  "org.apache.lucene" % "lucene-analyzers-common" % "6.5.1",
+  "org.apache.lucene" % "lucene-analyzers-kuromoji" % "6.5.1",
+  "org.apache.lucene" % "lucene-suggest" % "6.5.1",
+  "org.apache.lucene" % "lucene-backward-codecs" % "6.5.1",
+  "org.apache.lucene" % "lucene-misc" % "6.5.1",
+  "org.apache.solr" % "solr-solrj" % "6.5.1",
   "org.apache.opennlp" % "opennlp-tools" % "1.6.0",
   "org.apache.spark" %% "spark-core" % "1.6.1" exclude("org.slf4j", "slf4j-log4j12"),
   "org.apache.spark" %% "spark-mllib" % "1.6.1",
@@ -58,3 +59,14 @@ mappings in Universal ++=
   (baseDirectory.value / "conf/application.conf.sample" get) map
     (x => x -> ("conf/application.conf"))
 
+import com.typesafe.sbt.packager.Keys.scriptClasspath
+
+scriptClasspath := {
+  val originalClasspath = scriptClasspath.value
+  val manifest = new java.util.jar.Manifest()
+  manifest.getMainAttributes().putValue("Class-Path", originalClasspath.mkString(" "))
+  val classpathJar = (target in Universal).value / "lib" / "classpath.jar"
+  IO.jar(Seq.empty, classpathJar, manifest)
+  Seq(classpathJar.getName)
+}
+mappings in Universal += (((target in Universal).value / "lib" / "classpath.jar") -> "lib/classpath.jar")

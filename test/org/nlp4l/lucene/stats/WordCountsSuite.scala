@@ -18,9 +18,11 @@ package org.nlp4l.lucene.stats
 
 import org.apache.lucene.analysis.core.KeywordAnalyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer
+import org.apache.lucene.index.Term
+import org.apache.lucene.search.TermQuery
 import org.nlp4l.lucene._
 import org.nlp4l.lucene.analysis.Analyzer
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite}
 
 import scala.util.Try
 import scalax.file.Path
@@ -108,8 +110,9 @@ class WordCountsSuite extends FunSuite with BeforeAndAfterAll {
   }
   
   test("counts all word frequencies in specified documents set (with term vectors)") {
+    val searcher = ISearcher(indexDir)
+    val docset = searcher.searchDocIdSet(new TermQuery(new Term("title", "London Bridge A")))
     val reader = IReader(indexDir, schema)
-    val docset = reader.subset(TermFilter("title", "London Bridge A"))
     val counts = WordCounts.count(reader, "content1", Set.empty[String], docset)
     assert(counts.size > 0)
     assertResult(3)(counts.getOrElse("lady", 0))
@@ -118,8 +121,9 @@ class WordCountsSuite extends FunSuite with BeforeAndAfterAll {
   }
 
   test("counts all word frequencies in specified documents set (without term vectors)") {
+    val searcher = ISearcher(indexDir)
+    val docset = searcher.searchDocIdSet(new TermQuery(new Term("title", "London Bridge A")))
     val reader = IReader(indexDir, schema)
-    val docset = reader.subset(TermFilter("title", "London Bridge A"))
     val counts = WordCounts.count(reader, "content2", Set.empty[String], docset)
     assert(counts.size > 0)
     assertResult(3)(counts.getOrElse("lady", 0))

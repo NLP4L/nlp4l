@@ -23,7 +23,7 @@ import org.apache.lucene.analysis.ja.dict.UserDictionary
 import org.apache.lucene.analysis.ja.{JapaneseAnalyzer, JapaneseTokenizer}
 import org.apache.lucene.analysis.ja.tokenattributes.ReadingAttribute
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
-import org.apache.lucene.analysis.util.CharArraySet
+import org.apache.lucene.analysis.CharArraySet
 import org.nlp4l.framework.models._
 import org.nlp4l.framework.processors._
 import play.api.Logger

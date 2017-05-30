@@ -23,7 +23,7 @@ import java.util
 import com.typesafe.config.Config
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper
 import org.apache.lucene.analysis.standard.StandardAnalyzer
-import org.apache.lucene.analysis.util.CharArraySet
+import org.apache.lucene.analysis.CharArraySet
 import org.apache.lucene.analysis.{Analyzer, TokenStream}
 import org.apache.lucene.document._
 import org.apache.lucene.index.{IndexOptions, IndexWriter, IndexWriterConfig}

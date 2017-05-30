@@ -19,7 +19,6 @@ package org.nlp4l.lucene
 import org.apache.lucene.analysis.core.KeywordAnalyzer
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.index.Term
-import org.apache.lucene.search.{TermQuery, QueryWrapperFilter}
 import org.nlp4l.lucene.analysis.Analyzer
 import org.scalatest.{BeforeAndAfterAll, FlatSpec}
 
@@ -133,19 +132,6 @@ class RawReaderSpec extends FlatSpec with BeforeAndAfterAll{
   it should "return None if term vector not indexed" in {
     val reader = RawReader(indexDir)
     assert(reader.getTermVector(1, "title") == None)
-  }
-
-  it should "return index subset (DocSet)" in {
-    val reader = RawReader(indexDir)
-    //val filter = new QueryWrapperFilter(new TermQuery(new Term("content", "stone")))
-    val subDocs = reader.subset(TermFilter("content", "stone"))
-    assertResult(Set(9,10))(subDocs.toSet)
-  }
-
-  it should "return index universalset (DocSet)" in {
-    val reader = RawReader(indexDir)
-    val allDocs = reader.universalset()
-    assertResult(Set(0,1,2,5,6,7,8,9,10))(allDocs.toSet)
   }
 
   "A FieldInfo" should "return field information" in {

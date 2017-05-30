@@ -18,7 +18,6 @@ package org.nlp4l.lucene
 
 import java.nio.file.{FileSystems, Path}
 
-import org.apache.lucene.search.{Filter => LuceneFilter}
 import org.apache.lucene.search._
 
 /**
@@ -35,15 +34,19 @@ class ISearcher(val reader: RawReader) {
   /**
    * Search thd documents with given query, filter, sort criteria.
    * @param query the Query instance
-   * @param filter the Filter instance
    * @param rows the max number of documents to be returned
    * @param sort the Sort instance
    * @return the sequence of Document
    */
   // TODO: return org.nlp4l.core.Document instances instead of Lucene's Documents.
-  def search(query: Query = new MatchAllDocsQuery(), filter: LuceneFilter = null, rows: Int = 10, sort: Sort = Sort.RELEVANCE): Seq[Document] =
-    is.search(query, filter, rows, sort).scoreDocs.map(e => Document(e.doc, is.doc(e.doc)))
+  def search(query: Query = new MatchAllDocsQuery(), rows: Int = 10, sort: Sort = Sort.RELEVANCE): Seq[Document] =
+    is.search(query, rows, sort).scoreDocs.map(e => Document(e.doc, is.doc(e.doc)))
 
+  def searchDocIdSet(query: Query): Set[Int] =
+    is.search(query, Int.MaxValue, Sort.RELEVANCE).scoreDocs.map(_.doc).toSet
+
+  def searchAllDocIdSet(): Set[Int] =
+    searchDocIdSet(new MatchAllDocsQuery())
 }
 
 /**
