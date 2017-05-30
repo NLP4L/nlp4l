@@ -50,7 +50,7 @@ class UniqueRecordValidator(val cellname: String) extends Validator {
           }
         }
         catch{
-          case e => {
+          case e : Throwable => {
             val msg = s"cell name '$cellname' not found in some Records"
             logger.warn(msg)
             (false, Seq(msg, e.getMessage))

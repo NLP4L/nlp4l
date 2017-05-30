@@ -19,10 +19,11 @@ package org.nlp4l.framework.builtin.spark.mllib
 import java.io.{File, _}
 
 import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
+import org.apache.lucene.search.{IndexSearcher, MatchAllDocsQuery, TopDocs}
 import org.nlp4l.framework.builtin.lucene.LuceneIndexingProcessorEmbedded
 import org.nlp4l.framework.models.{Record, _}
 import org.nlp4l.framework.processors._
-import org.nlp4l.lucene.IReader
+import org.nlp4l.lucene.{IReader, ISearcher}
 import org.nlp4l.lucene.stats.TFIDF
 import resource._
 
@@ -124,7 +125,8 @@ class LabeledPointProcessor(val modelDir: String,
           selectLabelMap(reader, labelField)
       }
 
-      val docIds = reader.universalset().toList
+      val is = ISearcher(reader)
+      val docIds= is.searchAllDocIdSet().toList
       val labels = selectFieldValues(reader, docIds, Seq(labelField)).map(m => m(labelField).head).map(labelMap(_)).toVector
       val termBoosts = if (termBoostsFile != null) readTermBoostsFile(termBoostsFile) else Map.empty[String, Double]
       val (features: Seq[String], vectors: Stream[Seq[Double]]) =

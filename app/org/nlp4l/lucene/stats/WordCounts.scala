@@ -18,7 +18,7 @@ package org.nlp4l.lucene.stats
 
 import org.apache.lucene.util.PriorityQueue
 import org.nlp4l.lucene.analysis.Analyzer
-import org.nlp4l.lucene.{IReader, Field, DocSet, RawReader}
+import org.nlp4l.lucene.{IReader, Field, RawReader}
 
 import scala.collection.mutable
 

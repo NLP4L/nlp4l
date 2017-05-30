@@ -16,12 +16,14 @@
 
 package org.nlp4l.lucene
 
-import java.nio.file.{Path, FileSystems}
+import java.nio.file.{FileSystems, Path}
 import java.util.Comparator
 
-import org.apache.lucene.index.{SlowCompositeReaderWrapper, DirectoryReader, Term}
+import org.apache.lucene.index.{DirectoryReader, SlowCompositeReaderWrapper, Term}
 import org.apache.lucene.misc.{HighFreqTerms, TermStats}
+import org.apache.lucene.search.{IndexSearcher, Sort}
 import org.apache.lucene.store.FSDirectory
+import org.apache.lucene.util.DocIdSetBuilder
 
 /**
  * Class representing a index reader. This holds a Lucene LeafReader internally.
@@ -213,20 +215,6 @@ class RawReader(val path: Path) {
     HighFreqTerms.getHighFreqTerms(ir, numTerms, field, comparator)
       .map(s => (s.termtext.utf8ToString(), s.docFreq, s.totalTermFreq))
   }
-
-  /**
-   * Returns index subset with given filter.
-   * @param filter the Filter instance
-   * @return a new DocSet instance
-   */
-  def subset(filter: Filter): DocSet =
-    DocSet(filter.luceneFilter.getDocIdSet(ir.getContext, liveDocs).iterator())
-
-  /**
-   * Returns whole index as DocSet.
-   * @return a new DocSet instance holding all document ids in the index
-   */
-  def universalset(): DocSet = subset(AllDocsFilter())
 
   override def toString() = "IndexReader(path='%s',closed=%s)".format(path, closed)
 }

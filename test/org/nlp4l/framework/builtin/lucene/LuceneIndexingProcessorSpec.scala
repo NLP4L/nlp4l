@@ -19,10 +19,11 @@ package org.nlp4l.framework.builtin.lucene
 import java.io.{File, IOException, PrintWriter}
 
 import com.typesafe.config.ConfigFactory
-import org.apache.lucene.index.{IndexReader, MultiFields, Terms, TermsEnum}
+import org.apache.lucene.index._
+import org.apache.lucene.search.TermQuery
 import org.apache.lucene.util.BytesRef
 import org.nlp4l.framework.models._
-import org.nlp4l.lucene.RawReader
+import org.nlp4l.lucene.{ISearcher, RawReader}
 import org.specs2.mutable.{BeforeAfter, Specification}
 
 class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
@@ -108,7 +109,9 @@ class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
         reader.fieldMap.get("id")  must_!= None
         reader.fieldMap.get("cat")  must_!= None
         reader.fieldMap.get("body")  must_!= None
-        reader.universalset().size mustEqual(2)
+        val searcher = ISearcher(reader)
+        val docset = searcher.searchAllDocIdSet()
+        docset.size mustEqual(2)
         reader.document(0).get.getValue("id") mustEqual (Some(List("id-001")))
         reader.document(0).get.getValue("cat") mustEqual (Some(List("cat-a")))
         reader.document(0).get.getValue("body") mustEqual (Some(List("Hello. This is a body part of doc 001.")))
@@ -149,7 +152,9 @@ class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
         reader.fieldMap.get("id")  must_!= None
         reader.fieldMap.get("cat")  must_!= None
         reader.fieldMap.get("body")  must_!= None
-        reader.universalset().size mustEqual(2)
+        val searcher = ISearcher(reader)
+        val docset = searcher.searchAllDocIdSet()
+        docset.size mustEqual(2)
       } finally {
         if (reader != null)
           reader.close
@@ -182,8 +187,9 @@ class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
       ))
       val result1 = proc1.execute(Some(dict1))
       val reader1: RawReader = RawReader(config1.getString("index"))
+      val searcher1 = ISearcher(reader1)
       try {
-        reader1.universalset().size mustEqual(2)
+        searcher1.searchAllDocIdSet().size mustEqual(2)
       } finally {
         if (reader1 != null)
           reader1.close
@@ -209,11 +215,12 @@ class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
       ))
       val result2 = proc2.execute(Some(dict2))
       val reader2: RawReader = RawReader(config1.getString("index"))
+      val searcher2 = ISearcher(reader2)
       try {
-        reader2.universalset().size mustEqual(3)
+        searcher2.searchAllDocIdSet().size mustEqual(3)
       } finally {
-        if (reader1 != null)
-          reader1.close
+        if (reader2 != null)
+          reader2.close
       }
       true
     }
@@ -250,7 +257,9 @@ class LuceneIndexingProcessorSpec extends Specification with BeforeAfter {
         reader.fieldMap.get("id")  must_!= None
         reader.fieldMap.get("cat")  must_!= None
         reader.fieldMap.get("body")  must_!= None
-        reader.universalset().size mustEqual(2)
+        val searcher = ISearcher(reader)
+        val docset = searcher.searchAllDocIdSet()
+        docset.size mustEqual(2)
         reader.document(0).get.getValue("id") mustEqual (Some(List("id-001")))
         reader.document(0).get.getValue("cat") mustEqual (Some(List("cat-a")))
         reader.document(0).get.getValue("body") mustEqual (Some(List("Hello. This is a body part of doc 001.")))

@@ -34,7 +34,7 @@ class TermVector(tv: LuceneTerms) extends Map[String, Doc] {
     var term = te.next()
     while (term != null) {
       val text = term.utf8ToString()
-      val de = te.docs(null, null)
+      val de = te.postings(null)
       if (de != null) de.nextDoc()
       val pe = te.postings(null)
       if (pe != null) pe.nextDoc()
