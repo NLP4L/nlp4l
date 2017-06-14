@@ -1,10 +1,12 @@
 NLP4L/nlp4l change history
 
-========== 0.7-dev / YYYY-MM-DD ===================================
+========== 0.7-dev / 2017-06-13 ===================================
 
 Important Notice
 
 New Features & Improvements
+
+* Upgrade Lucene version to 6.6.0.
 
 Bug Fixes
 
