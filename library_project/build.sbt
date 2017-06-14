@@ -8,7 +8,7 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "NLP4L-framework-library",
-    version := "0.7-dev",
+    version := "0.7.0",
     scalacOptions := Seq("-encoding", "UTF-8", "-deprecation", "-unchecked"),
     parallelExecution := true,
     libraryDependencies ++= Seq(
