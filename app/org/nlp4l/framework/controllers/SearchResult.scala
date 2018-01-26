@@ -50,7 +50,7 @@ class SearchResult extends Controller {
         case _ => 10
       }
       val url = URLDecoder.decode(encodedUrl, "UTF-8")
-      val solr = new HttpSolrClient(url)
+      val solr = new HttpSolrClient.Builder(url).build()
       val query = URLDecoder.decode(encodedQuery, "UTF-8")
       val params = new ModifiableSolrParams().add("q", query).set("start", offset).set("rows", limit)
       val idField = request.getQueryString("id").getOrElse("id")

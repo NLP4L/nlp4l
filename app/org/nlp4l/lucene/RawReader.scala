@@ -19,11 +19,12 @@ package org.nlp4l.lucene
 import java.nio.file.{FileSystems, Path}
 import java.util.Comparator
 
-import org.apache.lucene.index.{DirectoryReader, SlowCompositeReaderWrapper, Term}
+import org.apache.lucene.index
+import org.apache.lucene.index._
 import org.apache.lucene.misc.{HighFreqTerms, TermStats}
 import org.apache.lucene.search.{IndexSearcher, Sort}
 import org.apache.lucene.store.FSDirectory
-import org.apache.lucene.util.DocIdSetBuilder
+import org.apache.lucene.util.{Bits, DocIdSetBuilder}
 
 /**
  * Class representing a index reader. This holds a Lucene LeafReader internally.
@@ -50,7 +51,7 @@ class RawReader(val path: Path) {
     mapBuilder.result
   }
 
-  lazy val numFields = ir.fields().size()
+  lazy val numFields = ir.fields.size()
 
   def fields = fieldMap.values.toSeq
 
