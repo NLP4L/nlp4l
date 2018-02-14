@@ -17,6 +17,7 @@
 package org.nlp4l.framework.builtin.kea
 
 import java.io._
+import java.nio.charset.Charset
 import java.nio.file.FileSystems
 
 import com.typesafe.config.Config
@@ -224,7 +225,7 @@ class KEAModelBuildProcessor(val textField: String,
   }
 
   def transformToMDLPDiscretizationModel(featuresModelFile: String, cutpModelFile: String): Unit = {
-    val lines: Seq[String] = FileUtils.readLines(new File(featuresModelFile))
+    val lines: Seq[String] = FileUtils.readLines(new File(featuresModelFile), Charset.defaultCharset)
     val featuresData: Seq[(Int, Map[Int, Double])] = lines.map {
       line => {
         val values: Array[String] = line.split("\\s")
