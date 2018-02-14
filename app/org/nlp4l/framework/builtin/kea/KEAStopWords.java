@@ -16,7 +16,7 @@
 
 package org.nlp4l.framework.builtin.kea;
 
-import org.apache.lucene.analysis.util.CharArraySet;
+import org.apache.lucene.analysis.CharArraySet;
 
 
 public class KEAStopWords {

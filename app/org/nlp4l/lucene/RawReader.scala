@@ -19,12 +19,12 @@ package org.nlp4l.lucene
 import java.nio.file.{FileSystems, Path}
 import java.util.Comparator
 
-import org.apache.lucene.index
 import org.apache.lucene.index._
 import org.apache.lucene.misc.{HighFreqTerms, TermStats}
 import org.apache.lucene.search.{IndexSearcher, Sort}
 import org.apache.lucene.store.FSDirectory
 import org.apache.lucene.util.{Bits, DocIdSetBuilder}
+import org.apache.solr.index._
 
 /**
  * Class representing a index reader. This holds a Lucene LeafReader internally.
@@ -45,13 +45,14 @@ class RawReader(val path: Path) {
     val it = ir.getFieldInfos.iterator()
     while (it.hasNext) {
       val info = it.next()
-      val field = new FieldInfo(info, ir.fields.terms(info.name), liveDocs, this)
+      val fields = MultiFields.getFields(dr)
+      val field = new FieldInfo(info, fields.terms(info.name), liveDocs, this)
       mapBuilder += (field.name -> field)
     }
     mapBuilder.result
   }
 
-  lazy val numFields = ir.fields.size()
+  lazy val numFields = fields.size
 
   def fields = fieldMap.values.toSeq
 
