@@ -17,6 +17,7 @@
 package org.nlp4l.framework.builtin.kea
 
 import java.io._
+import java.nio.charset.Charset
 import java.nio.file.FileSystems
 
 import com.typesafe.config.Config
@@ -245,7 +246,7 @@ class KeyphraseExtractionProcessor(val idField: String,
     val countDistanceNo: Array[Int] = new Array[Int](numDistance)
     val countYesNo: Array[Int] = new Array[Int](2)
 
-    val lines: Seq[String] = FileUtils.readLines(new File(file))
+    val lines: Seq[String] = FileUtils.readLines(new File(file), Charset.defaultCharset)
     lines.foreach { line => {
       val values: Array[String] = line.split("\\s")
       if (values(2).toBoolean) {

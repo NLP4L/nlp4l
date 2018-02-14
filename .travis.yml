@@ -1,0 +1,13 @@
+language: scala
+os: linux
+jdk: oraclejdk8
+
+scala:
+  - 2.11.8
+
+cache:
+  directories:
+    - $HOME/.sbt
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION test
