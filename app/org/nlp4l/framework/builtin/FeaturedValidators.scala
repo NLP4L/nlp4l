@@ -152,7 +152,7 @@ class SolrSearchValidator(val url: String, val collection: String, val field: St
         val notFounds = ArrayBuffer.empty[String]
         dic.recordList.foreach{ r =>
           try{
-            val solr = new HttpSolrClient(url)
+            val solr = new HttpSolrClient.Builder(url).build()
             r.cellValue(cellName) match {
               case Some(q) => {
                 val queries = if(separatedBy != null){
