@@ -5,9 +5,18 @@ jdk: oraclejdk8
 scala:
   - 2.11.8
 
+addons:
+  sonarcloud:
+    organization: yasufumi0410-github
+    token:
+      secure: 565e3ed28d5901690065521f080ca999a755cd51
+
 cache:
   directories:
     - $HOME/.sbt
+    - $HOME/.sonar/cache
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION test
+  - sonar-scanner
+
