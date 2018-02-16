@@ -16,20 +16,19 @@
 
 package org.nlp4l.framework.builtin.kea;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import com.typesafe.config.Config;
 import org.apache.commons.io.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
+import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.core.LowerCaseFilter;
 import org.apache.lucene.analysis.shingle.ShingleFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
-import org.apache.lucene.analysis.util.CharArraySet;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 
 public class KEAStandardAnalyzer extends Analyzer {
