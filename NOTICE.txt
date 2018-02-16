@@ -1,5 +1,5 @@
 NLP4L
-Copyright 2016 org.NLP4L
+Copyright 2016-2018 org.NLP4L
 
 This product includes the following Open Source Softwares
 
@@ -11,5 +11,8 @@ This product includes software developed at The Apache Software Foundation (http
 
 spark-MDLP-discretization (https://github.com/sramirez/spark-MDLP-discretization)
 [LICENSE] https://github.com/sramirez/spark-MDLP-discretization/blob/master/LICENSE
+
+OpenNLP models-1.5 (https://www.rondhuit.com/download/opennlp-models-1.5/)
+Use the model files just for test
 
 ================================================================================

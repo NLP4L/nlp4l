@@ -16,15 +16,15 @@
 
 package org.nlp4l.framework.builtin.ner
 
-import java.io.{FileOutputStream, File}
+import java.io._
+import java.net.URL
+import java.security.cert.X509Certificate
+import javax.net.ssl.{HttpsURLConnection, SSLContext, X509TrustManager}
 
 import com.typesafe.config.ConfigFactory
-import org.nlp4l.framework.models.{Cell, CellType, DictionaryAttribute, Record}
+import org.nlp4l.framework.models.{Cell, Record}
 import org.specs2.mutable.{BeforeAfter, Specification}
-import dispatch._, Defaults._
-
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import dispatch._
 
 class OpenNLPNerProcessorSpec extends Specification with BeforeAfter {
 
@@ -50,9 +50,35 @@ class OpenNLPNerProcessorSpec extends Specification with BeforeAfter {
 
   def downloadOpenNLPModel(file: String): Unit = {
     val modelFile = new File(OpenNLPModels.DIR, file)
+    val trustManager = new X509TrustManager {
+      override def getAcceptedIssuers: Array[X509Certificate] = null
+      override def checkClientTrusted(x509Certificates: Array[X509Certificate], s: String): Unit = {}
+      override def checkServerTrusted(x509Certificates: Array[X509Certificate], s: String): Unit = {}
+    }
+    val sc = SSLContext.getInstance("SSL")
+    sc.init(null, Array(trustManager), new java.security.SecureRandom())
+    HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+
     if(!modelFile.exists()){
-      val request = url(s"http://opennlp.sourceforge.net/models-1.5/$file")
-      Await.result(Http(request > as.File(modelFile)), Duration.Inf)
+      val downloadUrl = new URL(s"https://www.rondhuit.com/download/opennlp-models-1.5/$file")
+      val connection = downloadUrl.openConnection()
+
+      var in = None: Option[InputStream]
+      var out = None: Option[FileOutputStream]
+      try {
+        in = Some(connection.getInputStream)
+        out = Some(new FileOutputStream(modelFile))
+        var c = in.get.read
+        while (c >= 0) {
+          out.get.write(c)
+          c = in.get.read
+        }
+      } catch {
+        case e: IOException => e.printStackTrace
+      } finally {
+        if (in.isDefined) in.get.close
+        if (out.isDefined) out.get.close
+      }
     }
   }
 
