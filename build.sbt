@@ -73,3 +73,5 @@ scriptClasspath := {
   Seq(classpathJar.getName)
 }
 mappings in Universal += (((target in Universal).value / "lib" / "classpath.jar") -> "lib/classpath.jar")
+
+sources in doc in Compile := List()
