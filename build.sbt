@@ -2,7 +2,7 @@ name := """NLP4L"""
 
 organization := "org.nlp4l"
 
-version := "0.8-dev"
+version := "0.8.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
