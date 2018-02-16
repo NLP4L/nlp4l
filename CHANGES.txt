@@ -1,5 +1,26 @@
 NLP4L/nlp4l change history
 
+========== 0.8.1 / YYYY-MM-DD ===================================
+
+Important Notice
+
+New Features & Improvements
+
+Bug Fixes
+
+API Changes
+
+Javadoc Fixes
+
+Project environments
+
+Tests
+
+Deprecated/Deleted Features
+
+Others
+
+
 ========== 0.8.0 / 2018-02-17 ===================================
 
 Important Notice
