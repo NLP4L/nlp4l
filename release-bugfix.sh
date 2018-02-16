@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2016 org.NLP4L
+# Copyright (c) 2016-2018 org.NLP4L
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ NEXT_REL_NUM=$3
 #echo "THIS_REL_NUM : $THIS_REL_NUM"
 #echo "NEXT_REL_NUM : $NEXT_REL_NUM"
 
-echo -n "Have you executed ant test and has it successfully done? (y/n) "
+echo -n "Have you executed sbt test and has it successfully done? (y/n) "
 read ANS
 if [ $ANS != "y" ]; then
   exit 1
