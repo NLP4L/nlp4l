@@ -20,6 +20,9 @@ Deprecated/Deleted Features
 
 Others
 
+* Upgrade Lucene to 7.2.1
+* Upgrade OpenNLP to 1.8.4
+
 
 ========== 0.7.0 / 2017-06-13 ===================================
 
